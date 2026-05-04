@@ -1,166 +1,123 @@
 <div align="center">
 
+<br/>
+
 ```
-    ___    ____  _____ _   __   ___   _  ___   __   
-   / _ |  / __ \/ ____| | / /  / / | | |/ _ \ / /   
-  / /_\ \ / /_\ \\___ \| |/ /  / /  | |/ / |  \\ \  
- / _____ \|  __  |____) |   <  / /___| / /\\  \\_\\  \\ \\
-/_/   \\_\\_| |  \\_\\_____/|_|\\_\\/_____/|_/   \\_\\____/ \\/
-                                                      
+░█████╗░██████╗░███████╗██╗░░██╗███╗░░██╗░█████╗░██╗░░░██╗░█████╗░
+██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝████╗░██║██╔══██╗██║░░░██║██╔══██╗
+███████║██████╔╝█████╗░░░╚███╔╝░██╔██╗██║██║░░██║╚██╗░██╔╝███████║
+██╔══██║██╔═══╝░██╔══╝░░░██╔██╗░██║╚████║██║░░██║░╚████╔╝░██╔══██║
+██║░░██║██║░░░░░███████╗██╔╝╚██╗██║░╚███║╚█████╔╝░░╚██╔╝░░██║░░██║
+╚═╝░░╚═╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚══╝░╚════╝░░░░╚═╝░░░╚═╝░░╚═╝
+
+░█████╗░██████╗░███████╗███╗░░██╗░█████╗░
+██╔══██╗██╔══██╗██╔════╝████╗░██║██╔══██╗
+███████║██████╔╝█████╗░░██╔██╗██║███████║
+██╔══██║██╔══██╗██╔══╝░░██║╚████║██╔══██║
+██║░░██║██║░░██║███████╗██║░╚███║██║░░██║
+╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝╚═╝░░╚═╝
 ```
 
-# 🎮 APEXNOVA ARENA - The Ultimate Gaming & Tournament Platform
+<h3>⚡ Where Champions Rise · Built for Competitors · Engineered for Scale ⚡</h3>
 
-[![Fullstack](https://img.shields.io/badge/Fullstack-Developer-blue?style=for-the-badge&logo=rocket)](https://github.com/aky2004/ApexNova-Arena)
-[![Frontend](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react)](./frontend)
-[![Backend](https://img.shields.io/badge/Backend-Laravel-FF2D20?style=for-the-badge&logo=laravel)](./backend)
-[![Real-time](https://img.shields.io/badge/Real--time-WebSockets-green?style=for-the-badge)](https://github.com/laravel/reverb)
-[![Database](https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql)](./backend/config/database.php)
-[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen?style=for-the-badge)](https://github.com/aky2004/ApexNova-Arena)
+<br/>
 
----
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](./frontend)
+[![Laravel](https://img.shields.io/badge/Laravel_11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](./backend)
+[![PHP](https://img.shields.io/badge/PHP_8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](./backend)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](./backend)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](./backend)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](./frontend)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](./frontend)
+[![WebSockets](https://img.shields.io/badge/WebSockets-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://github.com/laravel/reverb)
 
-### 🌟 Unleash Your Gaming Potential
+<br/>
 
-**ApexNova Arena** is a cutting-edge gaming platform where players compete in tournaments, climb the rankings, and showcase their skills across multiple games. Built with modern fullstack technologies for seamless real-time gameplay.
+> **ApexNova Arena** is a full-stack competitive gaming platform with real-time tournament brackets, skill-based matchmaking, live leaderboards, and an in-game social ecosystem — powered by a Laravel + React + WebSocket architecture.
 
-[🚀 Get Started](#-quick-start) • [📖 Documentation](#-features) • [🤝 Contributing](#-contribute) • [💬 Support](#-support)
+<br/>
+
+[🚀 Quick Start](#-quick-start) &nbsp;·&nbsp; [🏗️ Architecture](#-architecture) &nbsp;·&nbsp; [📡 API Docs](#-api-reference) &nbsp;·&nbsp; [🗺️ Roadmap](#-roadmap) &nbsp;·&nbsp; [🤝 Contributing](#-contributing)
 
 ---
 
 </div>
 
-## 🎯 Core Features
+## 📸 Screenshots
 
-<div align="center">
-
-### 🎮 **Multiple Games**
-```
-┌─────────────────┐
-│   PLAY GAMES    │
-│  Compete across │
-│   various game  │
-│   categories    │
-└─────────────────┘
-```
-Experience diverse gaming modes tailored for competitive play and casual fun.
-
-### 🏆 **Tournament System**
-```
-┌─────────────────┐
-│   TOURNAMENTS   │
-│  Join brackets  │
-│  Compete fairly │
-│  Win big prizes │
-└─────────────────┘
-```
-Host, join, and manage tournaments with real-time leaderboards and live updates.
-
-### ⭐ **Dynamic Ranking**
-```
-┌─────────────────┐
-│   RANKINGS      │
-│  Track your     │
-│  progress &     │
-│  global stats   │
-└─────────────────┘
-```
-Real-time ranking system tracking performance, win-loss ratios, and skill ratings.
-
-### 👥 **Social Features**
-```
-┌─────────────────┐
-│  CONNECTIONS    │
-│  Add friends    │
-│  Receive invites│
-│  Team up & chat │
-└─────────────────┘
-```
-Friends system, game invitations, and real-time chat for seamless collaboration.
-
-</div>
+> _Frontend UI previews coming soon — first release in progress_
 
 ---
 
-## ⚡ Technology Stack
+## ✨ Feature Overview
 
-<div align="center">
-
-### 🎨 Frontend
-```
-React.js + Vite + TailwindCSS
-├─ High-performance SPA
-├─ Real-time state management
-├─ Responsive UI/UX design
-└─ WebSocket integration
-```
-
-### 🔧 Backend
-```
-Laravel 11 + PHP 8.3
-├─ RESTful API architecture
-├─ JWT authentication
-├─ Real-time events (Reverb)
-├─ Database migrations & seeders
-└─ Broadcasting channels
-```
-
-### 🗄️ Database & Services
-```
-PostgreSQL + Redis
-├─ Relational data modeling
-├─ Caching layer
-├─ Session management
-└─ Cloud storage (Cloudinary)
-```
-
-### 📡 Real-time Communication
-```
-WebSockets (Laravel Reverb)
-├─ Live game updates
-├─ Tournament broadcasts
-├─ Instant messaging
-└─ Presence tracking
-```
-
-</div>
+| Module | Features |
+|---|---|
+| 🎮 **Games** | Multi-game support, real-time sync, skill-based matchmaking, session analytics |
+| 🏆 **Tournaments** | Bracket generation, automated scoring, prize pool management, live feeds |
+| 📊 **Rankings** | Global leaderboards, division tiers, ELO-style rating, achievement system |
+| 👥 **Social** | Friend requests, real-time chat, game invitations, presence tracking |
+| 🔐 **Auth** | JWT + OTP email verification, role-based access, secure profile management |
+| 📡 **Real-time** | WebSocket events via Laravel Reverb — live scores, notifications, messaging |
 
 ---
 
-## 📊 Feature Highlights
+## 🏗️ Architecture
 
-### 🎮 **Games Module**
-- Multiple game categories and modes
-- Real-time game state synchronization
-- Skill-based matchmaking
-- Performance analytics and stats tracking
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         CLIENT (Browser)                            │
+│              React 18 + Vite + TailwindCSS + Axios                  │
+│         WebSocket Client ←────────────────────────────┐             │
+└──────────────────────────────┬──────────────────────── │ ───────────┘
+                               │ REST API                │ WS
+┌──────────────────────────────▼──────────────────────── │ ───────────┐
+│                       BACKEND (Laravel 11)              │             │
+│                                                         │             │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────▼──────────┐ │
+│  │ Controllers │  │  Middleware  │  │   Laravel Reverb (Reverb)   │ │
+│  │  (REST API) │  │ JWT + RBAC   │  │   WebSocket Broadcasting    │ │
+│  └──────┬──────┘  └──────────────┘  └─────────────────────────────┘ │
+│         │                                                             │
+│  ┌──────▼──────────────────────────────────────────┐                 │
+│  │                   Eloquent ORM                   │                 │
+│  └──────┬──────────────────────┬───────────────────┘                 │
+└─────────│──────────────────────│─────────────────────────────────────┘
+          │                      │
+┌─────────▼──────────┐  ┌───────▼──────────┐  ┌──────────────────────┐
+│    PostgreSQL DB    │  │  Redis (Cache)   │  │  Cloudinary (Media)  │
+│  Primary datastore  │  │  Sessions + Q    │  │  Avatars & Assets    │
+└────────────────────┘  └──────────────────┘  └──────────────────────┘
+```
 
-### 🏅 **Tournament Management**
-- Create and manage tournaments
-- Bracket generation and progression
-- Automated score calculation
-- Prize pool distribution
-- Live tournament feeds
+---
 
-### 📈 **Ranking System**
-- Global leaderboards
-- Division-based rankings
-- Win-loss tracking
-- Rating calculations
-- Achievement badges
-- Historical performance metrics
+## ⚡ Tech Stack
 
-### 🔐 **User System**
-- Secure JWT authentication
-- Email verification with OTP
-- Player profiles with statistics
-- Customizable user preferences
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **React 18** | Component-based SPA |
+| **Vite** | Next-gen build tooling |
+| **TailwindCSS** | Utility-first styling |
+| **Axios** | HTTP client with interceptors |
+| **Laravel Echo** | WebSocket client integration |
 
-### 💬 **Communication**
-- Real-time game chat
-- Friend messaging
-- Invite notifications
-- Tournament announcements
+### Backend
+| Technology | Purpose |
+|---|---|
+| **Laravel 11** | MVC framework + REST API |
+| **PHP 8.3** | Language runtime |
+| **Laravel Sanctum / JWT** | Token-based authentication |
+| **Laravel Reverb** | Native WebSocket server |
+| **Laravel Mail** | OTP + transactional email |
+
+### Infrastructure
+| Technology | Purpose |
+|---|---|
+| **PostgreSQL** | Primary relational database |
+| **Redis** | Caching + queue + sessions |
+| **Cloudinary** | Cloud media storage |
 
 ---
 
@@ -168,35 +125,34 @@ WebSockets (Laravel Reverb)
 
 ```
 ApexNova-Arena/
-├── 📂 frontend/                 # React.js application
-│   ├── src/
-│   │   ├── components/         # Reusable UI components
-│   │   ├── pages/              # Page components
-│   │   ├── hooks/              # Custom React hooks
-│   │   ├── context/            # Global state management
-│   │   ├── config/             # API configuration
-│   │   └── assets/             # Images, icons, media
-│   ├── vite.config.js
-│   └── package.json
 │
-├── 📂 backend/                  # Laravel application
-│   ├── app/
-│   │   ├── Models/             # Database models
-│   │   ├── Http/Controllers/   # API controllers
-│   │   ├── Events/             # Broadcasting events
-│   │   ├── Mail/               # Email templates
-│   │   └── Providers/          # Service providers
-│   ├── database/
-│   │   ├── migrations/         # Database schemas
-│   │   ├── factories/          # Test data factories
-│   │   └── seeders/            # Database seeders
-│   ├── routes/
-│   │   ├── api.php             # API routes
-│   │   └── channels.php        # Broadcasting channels
-│   ├── config/                 # Configuration files
-│   └── composer.json
+├── 📦 frontend/                    # React + Vite SPA
+│   └── src/
+│       ├── components/             # Reusable UI components
+│       ├── pages/                  # Route-level page components
+│       ├── hooks/                  # Custom React hooks
+│       ├── context/                # Global state (Context API)
+│       ├── config/                 # API base URLs, constants
+│       └── assets/                 # Icons, images, fonts
 │
-└── .gitignore                   # Unified git ignore
+├── 🔧 backend/                     # Laravel 11 API
+│   └── app/
+│       ├── Models/                 # Eloquent models
+│       ├── Http/
+│       │   ├── Controllers/        # API controllers
+│       │   └── Middleware/         # JWT, rate-limiting, RBAC
+│       ├── Events/                 # Broadcastable events
+│       ├── Mail/                   # Mailable classes
+│       └── Providers/              # Service providers
+│   └── database/
+│       ├── migrations/             # Schema definitions
+│       ├── factories/              # Fake data factories
+│       └── seeders/                # Database seeders
+│   └── routes/
+│       ├── api.php                 # REST API routes
+│       └── channels.php            # Broadcasting channel definitions
+│
+└── .gitignore
 ```
 
 ---
@@ -204,231 +160,219 @@ ApexNova-Arena/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ & npm
-- PHP 8.3+
-- Composer
-- PostgreSQL
-- Redis (optional)
 
-### Frontend Setup
+- **Node.js** v18+ & npm
+- **PHP** 8.3+ & Composer
+- **PostgreSQL** 14+
+- **Redis** (optional, recommended)
+
+---
+
+### 1. Clone the Repository
 
 ```bash
-cd frontend
-npm install
-npm run dev
+git clone https://github.com/aky2004/ApexNova-Arena.git
+cd ApexNova-Arena
 ```
 
-### Backend Setup
+### 2. Backend Setup
 
 ```bash
 cd backend
+
+# Install PHP dependencies
 composer install
+
+# Configure environment
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
+
+# Set up database
+php artisan migrate --seed
+
+# Start the server
 php artisan serve
+
+# (Optional) Start WebSocket server
+php artisan reverb:start
 ```
 
-### Environment Configuration
+### 3. Frontend Setup
 
-Create `.env` files in both directories with required API keys:
-- Database credentials
-- JWT secret
-- Cloudinary API keys
-- Email service configuration
+```bash
+cd frontend
+
+# Install JS dependencies
+npm install
+
+# Start dev server
+npm run dev
+```
+
+### 4. Environment Variables
+
+**`backend/.env`**
+```env
+APP_NAME=ApexNova-Arena
+APP_ENV=local
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=apexnova
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+JWT_SECRET=your_jwt_secret_here
+
+REVERB_APP_ID=your_reverb_app_id
+REVERB_APP_KEY=your_reverb_app_key
+REVERB_APP_SECRET=your_reverb_app_secret
+
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
+
+MAIL_MAILER=smtp
+MAIL_HOST=your_mail_host
+MAIL_PORT=587
+MAIL_USERNAME=your_email
+MAIL_PASSWORD=your_password
+```
+
+**`frontend/.env`**
+```env
+VITE_API_BASE_URL=http://localhost:8000/api
+VITE_WS_HOST=localhost
+VITE_WS_PORT=8080
+```
 
 ---
 
-## 🎮 How It Works
-
-### 1️⃣ **Register & Build Your Profile**
-Sign up, verify your email with OTP, and create your gaming profile with avatar and bio.
-
-### 2️⃣ **Browse Games & Tournaments**
-Explore available games and upcoming tournaments with detailed information and prize pools.
-
-### 3️⃣ **Join or Create Tournaments**
-Participate in tournaments or create your own with custom rules and formats.
-
-### 4️⃣ **Play & Compete**
-Engage in real-time matches with live updates, chat, and performance tracking.
-
-### 5️⃣ **Climb the Rankings**
-Earn points, badges, and achievements as you progress in our global ranking system.
-
-### 6️⃣ **Connect & Collaborate**
-Add friends, receive invitations, and team up for group tournaments.
-
----
-
-## 🔧 API Endpoints Overview
+## 📡 API Reference
 
 ### Authentication
-```
-POST   /api/auth/register       - User registration
-POST   /api/auth/login          - User login
-POST   /api/auth/verify-otp     - Verify OTP
-POST   /api/auth/logout         - User logout
+
+```http
+POST   /api/auth/register          Register new player
+POST   /api/auth/login             Login + receive JWT
+POST   /api/auth/verify-otp        Email OTP verification
+POST   /api/auth/logout            Invalidate token
 ```
 
 ### Games
-```
-GET    /api/games               - List all games
-GET    /api/games/{id}          - Game details
-POST   /api/games/{id}/play     - Start game session
+
+```http
+GET    /api/games                  List all available games
+GET    /api/games/{id}             Get game details
+POST   /api/games/{id}/play        Create a game session
 ```
 
 ### Tournaments
-```
-GET    /api/tournaments         - List tournaments
-POST   /api/tournaments         - Create tournament
-POST   /api/tournaments/{id}/join - Join tournament
-GET    /api/tournaments/{id}/brackets - Tournament brackets
+
+```http
+GET    /api/tournaments            Browse all tournaments
+POST   /api/tournaments            Create a tournament
+POST   /api/tournaments/{id}/join  Join a tournament
+GET    /api/tournaments/{id}/brackets  View bracket progression
 ```
 
 ### Rankings
-```
-GET    /api/rankings            - Global leaderboard
-GET    /api/rankings/{userId}   - User ranking stats
-GET    /api/rankings/stats      - Performance analytics
+
+```http
+GET    /api/rankings               Global leaderboard
+GET    /api/rankings/{userId}      Player ranking profile
+GET    /api/rankings/stats         Aggregate analytics
 ```
 
-### Friends & Social
-```
-GET    /api/friends             - Friends list
-POST   /api/friends/{userId}    - Send friend request
-POST   /api/friends/{userId}/accept - Accept request
+### Social
+
+```http
+GET    /api/friends                List friends
+POST   /api/friends/{userId}       Send friend request
+PUT    /api/friends/{userId}/accept  Accept request
+DELETE /api/friends/{userId}       Remove friend
 ```
 
 ---
 
-## 📊 Database Models
+## 🗄️ Database Schema (Core Entities)
 
-### Core Entities
-- **Users** - Player accounts with profiles
-- **Games** - Available game definitions
-- **GameRooms** - Active game sessions
-- **GameScores** - Game statistics
-- **Tournaments** - Tournament configurations
-- **GameInvites** - Game invitations
-- **Friendships** - Friend relationships
-- **RoomMessages** - Chat messages
-- **Rankings** - Leaderboard data
+```
+users               → id, username, email, avatar, rating, created_at
+games               → id, name, type, max_players, config
+game_rooms          → id, game_id, host_id, status, started_at
+game_scores         → id, room_id, user_id, score, result
+tournaments         → id, name, game_id, host_id, bracket_type, prize_pool, status
+tournament_entries  → id, tournament_id, user_id, seed
+game_invites        → id, sender_id, receiver_id, room_id, status
+friendships         → id, user_id, friend_id, accepted_at
+room_messages       → id, room_id, user_id, message, created_at
+rankings            → id, user_id, game_id, elo, division, wins, losses
+```
 
 ---
 
-## 🎨 UI/UX Features
+## 🔄 Real-time Events (WebSockets)
 
-- **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
-- **Dark Mode Support** - Eye-friendly interface options
-- **Real-time Notifications** - Instant alerts for invites, messages, rankings
-- **Smooth Animations** - Polished transitions and micro-interactions
-- **Accessibility** - WCAG compliant for all users
-- **Performance Optimized** - Fast load times and smooth gameplay
+| Event | Channel | Trigger |
+|---|---|---|
+| `GameUpdated` | `game.{roomId}` | Score change or state update |
+| `TournamentBracketUpdated` | `tournament.{id}` | Match result recorded |
+| `NewMessage` | `room.{roomId}` | Chat message sent |
+| `FriendRequestReceived` | `user.{userId}` | Friend request sent |
+| `GameInviteReceived` | `user.{userId}` | Invite dispatched |
+
+---
+
+## 🗺️ Roadmap
+
+```
+Phase 1 — Foundation ✅
+  [x] Auth system (JWT + OTP)
+  [x] Games module
+  [x] Tournament system
+  [x] Ranking engine
+  [x] Real-time WebSockets
+  [x] Social features (friends, chat, invites)
+
+Phase 2 — Enhancement 🔄
+  [ ] Mobile-responsive UI polish
+  [ ] Advanced tournament formats (round-robin, swiss)
+  [ ] In-app notifications center
+  [ ] Player analytics dashboard
+
+Phase 3 — Scale ⏳
+  [ ] AI-powered matchmaking
+  [ ] Spectator mode with live stream integration
+  [ ] Native mobile app (React Native)
+  [ ] Public API + developer SDK
+```
 
 ---
 
 ## 🧪 Testing
 
 ```bash
-# Backend tests
+# Backend — PHPUnit
 cd backend
 php artisan test
 
-# Frontend tests (setup required)
+# Backend — with coverage
+php artisan test --coverage
+
+# Frontend — Vitest
 cd frontend
 npm run test
 ```
 
 ---
 
-## 📝 Environment Variables
-
-### Backend (.env)
-```env
-APP_NAME=ApexNova-Arena
-APP_ENV=local
-DATABASE_URL=postgresql://user:password@localhost/apexnova
-JWT_SECRET=your_jwt_secret
-REVERB_APP_ID=your_reverb_id
-CLOUDINARY_URL=cloudinary://key:secret@cloud
-```
-
-### Frontend (.env)
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-VITE_WS_URL=ws://localhost:8000
-```
-
----
-
-## 🤝 Contribute
-
-We love contributions! Here's how you can help:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Code Guidelines
-- Follow PSR-12 for PHP code
-- Use ES6+ standards for JavaScript
-- Write meaningful commit messages
-- Include tests for new features
-- Update documentation
-
----
-
-## 🐛 Known Issues & Roadmap
-
-### Current Phase
-- ✅ Core game mechanics
-- ✅ Tournament system
-- ✅ Real-time features
-- 🔄 Mobile app (in development)
-- 🔄 Advanced analytics
-- ⏳ AI-powered matchmaking
-- ⏳ Spectator mode
-
----
-
-## 📞 Support & Community
-
-- 📧 **Email** - support@apexnova.com
-- 💬 **Discord** - [Join Community](https://discord.gg/apexnova)
-- 🐛 **Issues** - [GitHub Issues](https://github.com/aky2004/ApexNova-Arena/issues)
-- 📚 **Wiki** - [Documentation](https://github.com/aky2004/ApexNova-Arena/wiki)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙌 Acknowledgments
-
-Built with passion by fullstack developers who believe gaming should be competitive, fun, and accessible to everyone.
 
 <div align="center">
 
-### ⭐ If you find this project helpful, please give it a star!
+<br/>
 
-```
-    ___    ____  _____ _   __   ___   _  ___   __   
-   / _ |  / __ \/ ____| | / /  / / | | |/ _ \ / /   
-  / /_\ \ / /_\ \\___ \| |/ /  / /  | |/ / |  \\ \  
- / _____ \|  __  |____) |   <  / /___| / /\\  \\_\\  \\ \\
-/_/   \\_\\_| |  \\_\\_____/|_|\\_\\/_____/|_/   \\_\\____/ \\/
+**[Aman Kumar Yadav](https://github.com/aky2004) — Fullstack Developer**
 
-      🎮 ApexNova Arena - Where Champions Rise 🏆
-```
-
-**Made with ❤️ by the ApexNova Development Team**
-
-[⬆ Back to top](#apexnova-arena---the-ultimate-gaming--tournament-platform)
-
+<br/>
 </div>
