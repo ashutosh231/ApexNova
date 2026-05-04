@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mc",
+    "quote": "Real-time leaderboard updates feel illegal — I climbed three ranks in one session without refreshing once.",
+    "name": "Marcus Chen",
+    "handle": "@neonblade_gg",
+    "meta": "Snake · #1 ranked",
+    "rating": 5
+  },
+  {
+    "id": "as",
+    "quote": "Prize rails hit instantly. Brackets are clean, anti-cheat is visible, and the obsidian UI actually matches the hype.",
+    "name": "Aria Sullivan",
+    "handle": "@pixelqueen",
+    "meta": "Memory Match · 3× winner",
+    "rating": 5
+  },
+  {
+    "id": "dp",
+    "quote": "Reaction Test here is unfairly addictive. Latency readouts and queue tags make it feel like a pro client, not a browser toy.",
+    "name": "Dev Patel",
+    "handle": "@swiftace_g",
+    "meta": "Reaction Test · finalist",
+    "rating": 5
+  },
+  {
+    "id": "lp",
+    "quote": "Private rooms, instant invites, zero drama. This is how casual esports should have worked ten years ago.",
+    "name": "Luna Park",
+    "handle": "@gridmaster",
+    "meta": "Tic Tac Toe · elite",
+    "rating": 5
+  }
+]

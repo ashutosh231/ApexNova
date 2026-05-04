@@ -1,0 +1,10 @@
+[
+  { "id": "hf", "name": "HyperForge", "tag": "HF" },
+  { "id": "sv", "name": "SteelVector", "tag": "SV" },
+  { "id": "ng", "name": "NeonGrid", "tag": "NG" },
+  { "id": "p9", "name": "PulseNine", "tag": "P9" },
+  { "id": "cb", "name": "CircuitBay", "tag": "CB" },
+  { "id": "vs", "name": "VoidStack", "tag": "VS" },
+  { "id": "ar", "name": "ArcRaid", "tag": "AR" },
+  { "id": "sd", "name": "SignalDrop", "tag": "SD" }
+]
