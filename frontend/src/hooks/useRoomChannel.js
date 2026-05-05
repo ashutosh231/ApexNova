@@ -4,14 +4,30 @@ import getEcho from '../lib/echo';
 /**
  * Subscribes to a private Reverb room channel.
  * Falls back gracefully if Echo/WS is not available.
+ *
+ * setRoom() does a FULL replace (not merge) so stale player
+ * data never lingers after a poll or refresh.
  */
 export function useRoomChannel(roomCode, initialRoom = null) {
-  const [room, setRoom]         = useState(initialRoom);
+  const [room, setRoomState]    = useState(initialRoom);
   const [messages, setMessages] = useState([]);
   const channelRef              = useRef(null);
 
+  // Full replace — never merge, so removed players disappear immediately
+  const setRoom = useCallback((data) => {
+    if (!data) return;
+    setRoomState(data);
+  }, []);
+
+  // Merge only specific fields from a WS event (status, players array, etc.)
+  // This handles partial event payloads from Reverb without wiping everything
   const mergeRoom = useCallback((data) => {
-    setRoom(prev => ({ ...(prev ?? {}), ...data }));
+    setRoomState(prev => {
+      if (!prev) return data;           // first update — just set it
+      if (!data) return prev;
+      // If the event contains a full players array, replace it entirely
+      return { ...prev, ...data };
+    });
   }, []);
 
   useEffect(() => {
@@ -25,11 +41,15 @@ export function useRoomChannel(roomCode, initialRoom = null) {
       channel = echo.private(`room.${roomCode}`);
       channelRef.current = channel;
 
-      channel.listen('.room.updated',   (d) => mergeRoom(d));
-      channel.listen('.match.started',  (d) => mergeRoom(d));
-      channel.listen('.match.finished', (d) => mergeRoom(d));
-      channel.listen('.score.submitted',(d) => mergeRoom(d));
-      channel.listen('.chat.message',   (msg) => setMessages(prev => [...prev, msg]));
+      channel.listen('.room.updated',    (d) => setRoom(d));
+      channel.listen('.match.started',   (d) => setRoom(d));
+      channel.listen('.match.finished',  (d) => setRoom(d));
+      channel.listen('.score.submitted', (d) => mergeRoom(d));
+      channel.listen('.chat.message',    (msg) => setMessages(prev => [...prev, msg]));
+
+      channel.error((err) => {
+        console.warn('[useRoomChannel] channel error:', err);
+      });
     } catch (e) {
       console.warn('[useRoomChannel] subscribe error:', e.message);
     }
@@ -45,7 +65,7 @@ export function useRoomChannel(roomCode, initialRoom = null) {
       } catch {}
       channelRef.current = null;
     };
-  }, [roomCode, mergeRoom]);
+  }, [roomCode, setRoom, mergeRoom]);
 
   return { room, setRoom, messages, setMessages };
 }

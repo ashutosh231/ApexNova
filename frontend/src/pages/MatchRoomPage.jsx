@@ -71,6 +71,7 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
   const [countdown, setCountdown] = useState(null);
   const [friends, setFriends]     = useState([]);
   const msgEndRef = useRef(null);
+  const countdownStarted = useRef(false); // guard: prevent re-entry when room polls update
 
   const { room, setRoom, messages, setMessages } = useRoomChannel(roomCode || null);
 
@@ -94,16 +95,33 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
 
   useEffect(() => {
     if (!roomCode) return undefined;
+    // Poll room state every 2s — fallback when WebSocket isn't delivering
     const poll = setInterval(async () => {
       try {
         const data = await api(`/rooms/${roomCode}`);
         setRoom(data.room);
       } catch {
-        /* realtime/poll fallback should stay quiet on transient failures */
+        /* silent fallback */
       }
-    }, 2500);
+    }, 2000);
     return () => clearInterval(poll);
   }, [roomCode, api, setRoom]);
+
+  // Poll chat messages every 3s — fallback for real-time chat.
+  // Full replace: removes optimistic messages (fake Date.now() IDs)
+  // when the server's real messages arrive, preventing duplicates.
+  useEffect(() => {
+    if (!roomCode) return undefined;
+    const pollChat = setInterval(async () => {
+      try {
+        const data = await api(`/rooms/${roomCode}/messages`);
+        setMessages(data.messages || []);
+      } catch {
+        /* silent */
+      }
+    }, 3000);
+    return () => clearInterval(pollChat);
+  }, [roomCode, api, setMessages]);
 
   const toggleReady = async () => {
     setError('');
@@ -131,27 +149,52 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
   const sendMsg = async () => {
     if (!msg.trim() || sending) return;
     setSending(true);
-    const optimistic = { id: Date.now(), user_id: user.id, name: user.name, gamer_tag: user.gamer_tag, avatar_url: user.avatar_url, message: msg.trim(), created_at: new Date().toISOString(), isMe: true };
+    // Optimistic: show immediately with a temp id
+    const tempId = `temp_${Date.now()}`;
+    const optimistic = { id: tempId, user_id: user.id, name: user.name, gamer_tag: user.gamer_tag, avatar_url: user.avatar_url, message: msg.trim(), created_at: new Date().toISOString(), isMe: true };
     setMessages(p => [...p, optimistic]);
     setMsg('');
-    try { await api(`/rooms/${roomCode}/chat`,'POST',{message: optimistic.message}); }
-    catch { /* optimistic ok */ }
+    try {
+      await api(`/rooms/${roomCode}/chat`, 'POST', { message: optimistic.message });
+      // Replace optimistic with real messages from server (removes fake tempId)
+      const data = await api(`/rooms/${roomCode}/messages`);
+      setMessages(data.messages || []);
+    } catch {
+      // Keep optimistic on failure so user sees their own message
+    }
     finally { setSending(false); }
   };
 
-  // Watch for match.started via room state
+  // Watch for match.started via room state.
+  // IMPORTANT: only depend on room?.status — NOT the room object itself.
+  // The room object changes reference on every 2.5s poll, which would restart
+  // the countdown over and over if included in the dependency array.
+  const roomRef = useRef(room);
+  useEffect(() => { roomRef.current = room; }, [room]);
+
   useEffect(() => {
-    if (room?.status === 'active') {
-      setCountdown(3);
-      let n = 3;
-      const iv = setInterval(() => {
-        n--;
-        if (n === 0) { clearInterval(iv); setCountdown(null); onMatchStart(roomCode, room); }
-        else setCountdown(n);
-      }, 1000);
-      return () => clearInterval(iv);
+    if (room?.status !== 'active') {
+      // Reset guard when room goes back to waiting (e.g. play-again)
+      countdownStarted.current = false;
+      return;
     }
-  }, [room?.status, onMatchStart, roomCode, room]);
+    if (countdownStarted.current) return; // already running
+    countdownStarted.current = true;
+    setCountdown(3);
+    let n = 3;
+    const iv = setInterval(() => {
+      n--;
+      if (n === 0) {
+        clearInterval(iv);
+        setCountdown(null);
+        onMatchStart(roomCode, roomRef.current);
+      } else {
+        setCountdown(n);
+      }
+    }, 1000);
+    return () => clearInterval(iv);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room?.status]); // ← only status, not room object
 
   useEffect(() => { msgEndRef.current?.scrollIntoView({behavior:'smooth'}); }, [messages]);
 
