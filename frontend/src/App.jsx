@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CustomCursor from './components/CustomCursor.jsx';
 import { Routes, Route } from 'react-router-dom';
 import './index.css';
+import './arena.css';
 
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';

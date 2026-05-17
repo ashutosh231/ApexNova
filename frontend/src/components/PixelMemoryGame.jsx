@@ -13,12 +13,8 @@ const CONFIGS = {
   hard:   { pairs: 12, cols: 6 },
 };
 
-const NEON_PINK = '#ff00ff';
-const NEON_CYAN = '#00ffff';
-const NEON_GREEN = '#39ff14';
-
 /* ─── Card Component ─── */
-const MemoryCard = ({ icon, flipped, matched, onClick, disabled }) => {
+const MemoryCard = ({ icon, flipped, matched, onClick, disabled, neonA, neonB, neonOk }) => {
   return (
     <div
       onClick={() => !disabled && !flipped && !matched && onClick()}
@@ -48,7 +44,7 @@ const MemoryCard = ({ icon, flipped, matched, onClick, disabled }) => {
           fontSize: 28, color: 'rgba(100,116,139,0.5)',
           transition: 'border-color 0.2s',
         }}
-        onMouseEnter={e => { if (!flipped && !matched && !disabled) e.currentTarget.style.borderColor = NEON_CYAN; }}
+        onMouseEnter={e => { if (!flipped && !matched && !disabled) e.currentTarget.style.borderColor = neonA; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.4)'; }}
         >
           ?
@@ -58,12 +54,12 @@ const MemoryCard = ({ icon, flipped, matched, onClick, disabled }) => {
           backfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',
           position: 'absolute', width: '100%', height: '100%',
-          background: matched ? 'rgba(57,255,20,0.08)' : 'rgba(0,0,0,0.9)',
-          border: `3px solid ${matched ? NEON_GREEN : NEON_PINK}`,
+          background: matched ? `${neonOk}14` : 'rgba(0,0,0,0.9)',
+          border: `3px solid ${matched ? neonOk : neonB}`,
           borderRadius: 8,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 36,
-          boxShadow: matched ? `0 0 20px ${NEON_GREEN}40` : `0 0 15px ${NEON_PINK}30`,
+          boxShadow: matched ? `0 0 20px ${neonOk}40` : `0 0 15px ${neonB}30`,
         }}>
           {icon}
         </div>
@@ -73,7 +69,12 @@ const MemoryCard = ({ icon, flipped, matched, onClick, disabled }) => {
 };
 
 /* ─── Main PixelMemoryGame Component ─── */
-const PixelMemoryGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRestart = true }) => {
+const PixelMemoryGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRestart = true, accent, secondary }) => {
+  // Allow per-tournament theming. If not provided, default to classic cyan/pink.
+  const NEON_PINK = secondary || '#ff00ff';
+  const NEON_CYAN = accent || '#00ffff';
+  const NEON_GREEN = '#39ff14';
+
   const [difficulty, setDifficulty] = useState('normal');
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -318,6 +319,9 @@ const PixelMemoryGame = ({ onGameOver, playerName = 'You', autoStart = false, al
               matched={matchedPairs.has(card.icon)}
               onClick={() => handleCardClick(idx)}
               disabled={isLocked || gameState !== 'playing'}
+              neonA={NEON_CYAN}
+              neonB={NEON_PINK}
+              neonOk={NEON_GREEN}
             />
           ))}
         </div>

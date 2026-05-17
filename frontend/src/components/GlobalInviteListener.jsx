@@ -14,14 +14,8 @@ const INVITE_GAME_LABEL = {
   snake: 'Snake Championship',
   memory: 'Memory Match',
   tic_tac_toe: 'Tic Tac Toe',
-  reaction: 'Reaction Speed',
   number: 'Number Guessing',
-  word_blitz: 'Word Blitz',
   chess: 'Chess Blitz',
-  color_surge: 'Color Surge',
-  math_rush: 'Math Rush',
-  math_maze: 'Math Maze',
-  ability_duels: 'Ability Duels',
 };
 
 const glass = {
