@@ -7,12 +7,32 @@ import ChessBlitzGame from './ChessBlitzGame';
 
 /**
  * Renders the playable mini-game for a tournament `gameKey`.
- * All games call `onGameOver(totalScore)` once the run is complete.
+ * Games call `onGameOver(totalScore)` once a run is complete.
+ *
+ * For multiplayer-aware games (chess, tic-tac-toe), we also pass:
+ *   - roomCode  — non-null = multiplayer mode
+ *   - userId    — current player id (used to decide colour / X-O)
+ *   - players   — current room.players[] from useRoomChannel
+ *   - token     — auth token for /rooms/{code}/move relay
  *
  * Active gameKeys: snake, tic_tac_toe, memory, number, chess
  */
-export default function TournamentGameRouter({ gameKey, playerName, onGameOver, autoStart, allowRestart, themeAccent, themeSecondary }) {
+export default function TournamentGameRouter({
+  gameKey,
+  playerName,
+  onGameOver,
+  autoStart,
+  allowRestart,
+  themeAccent,
+  themeSecondary,
+  // multiplayer extras (optional)
+  roomCode,
+  userId,
+  players,
+  token,
+}) {
   const sharedProps = { playerName, onGameOver, autoStart, allowRestart };
+  const mpProps = { roomCode, userId, players, token };
 
   switch (gameKey) {
     case 'snake':
@@ -38,6 +58,7 @@ export default function TournamentGameRouter({ gameKey, playerName, onGameOver, 
           playerName={playerName}
           accent={themeAccent || '#f97316'}
           secondary={themeSecondary || '#ef4444'}
+          {...mpProps}
         />
       );
     case 'number':
@@ -54,6 +75,7 @@ export default function TournamentGameRouter({ gameKey, playerName, onGameOver, 
           onGameOver={onGameOver}
           accent={themeAccent || '#60a5fa'}
           secondary={themeSecondary || '#6366f1'}
+          {...mpProps}
         />
       );
     default:

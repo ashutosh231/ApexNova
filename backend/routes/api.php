@@ -7,6 +7,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LobbyController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\GameRoomController;
+use App\Http\Controllers\TournamentController;
+
+Route::get('/tournaments', [TournamentController::class, 'index']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -58,6 +61,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{code}/play-again',     [GameRoomController::class, 'playAgain']);
         Route::post('/{code}/chat',           [GameRoomController::class, 'chat']);
         Route::post('/{code}/score',          [GameRoomController::class, 'submitScore']);
+        Route::post('/{code}/move',           [GameRoomController::class, 'relayMove']);
         Route::get('/{code}/messages',        [GameRoomController::class, 'messages']);
     });
 });

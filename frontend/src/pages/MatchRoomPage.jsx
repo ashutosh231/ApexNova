@@ -17,7 +17,7 @@ import {
 const LIME = '#ccff00';
 const GREEN = '#10b981';
 const PURPLE = '#a855f7';
-const DEFAULT_THEME = { accent: LIME, secondary: GREEN, label: 'Tournament', emoji: '🎮' };
+const DEFAULT_THEME = { accent: LIME, secondary: GREEN, label: 'Tournament', icon: 'tabler:device-gamepad-2', iconAlt: 'tabler:trophy' };
 const MONO = "'JetBrains Mono', monospace";
 
 /* ────────── Avatar ────────── */
@@ -53,7 +53,9 @@ const ArenaHeader = ({ theme, onBack, phaseLabel }) => (
           display: 'grid', placeItems: 'center',
           boxShadow: `0 6px 22px -8px ${theme.accent}`,
         }}>
-          <span style={{ fontSize: 18, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))' }}>{theme.emoji}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))', color: '#0a0a0c' }}>
+            <iconify-icon icon={theme.icon || 'tabler:device-gamepad-2'} width="22" />
+          </span>
         </div>
         <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.04em', color: '#fff' }}>
           Apex<span style={{ color: theme.accent }}>Nova</span>
@@ -194,9 +196,9 @@ const ModeSelection = ({ onSolo, onFriend, theme = DEFAULT_THEME, gameKey }) => 
             <div style={{ marginTop: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {[
-                  { label: 'Multiplier', value: '1.2×', icon: '⚡' },
-                  { label: 'Difficulty', value: 'Adaptive', icon: '🧠' },
-                  { label: 'Time', value: '60s', icon: '⏱' },
+                  { label: 'Multiplier', value: '1.2×', icon: 'tabler:bolt' },
+                  { label: 'Difficulty', value: 'Adaptive', icon: 'tabler:brain' },
+                  { label: 'Time', value: '60s', icon: 'tabler:clock' },
                 ].map((s) => (
                   <div key={s.label} style={{
                     padding: '12px 16px', borderRadius: 14,
@@ -205,8 +207,8 @@ const ModeSelection = ({ onSolo, onFriend, theme = DEFAULT_THEME, gameKey }) => 
                     backdropFilter: 'blur(8px)',
                     minWidth: 100,
                   }}>
-                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.45)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span>{s.icon}</span> {s.label}
+                    <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.45)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <iconify-icon icon={s.icon} width="11" /> {s.label}
                     </div>
                     <div style={{ fontWeight: 800, fontSize: 17, color: s.value === 'Adaptive' ? '#fff' : accent, fontStyle: s.value === 'Adaptive' ? 'italic' : 'normal' }}>
                       {s.value}
@@ -600,7 +602,7 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
           <div className="arena-card-glow arena-card" style={{ '--glow-color': `${accent}88`, '--glow-color-2': `${sec}66`, padding: 0 }}>
             <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18 }}>👥</span>
+                <iconify-icon icon="tabler:users" width="20" style={{ color: accent }} />
                 <span style={{ fontWeight: 800, color: '#fff', fontSize: 15 }}>Roster</span>
                 <span className="arena-pill" style={{ fontSize: 9 }}>
                   {playerCount} / 4
@@ -707,7 +709,7 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
         {/* ── Middle: Chat ── */}
         <div className="arena-card" style={{ display: 'flex', flexDirection: 'column', height: 480 }}>
           <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 16 }}>💬</span>
+            <iconify-icon icon="tabler:message-circle-2" width="18" style={{ color: accent }} />
             <span style={{ fontWeight: 800, color: '#fff', fontSize: 14 }}>Squad chat</span>
             <span className="arena-pill" style={{ marginLeft: 'auto', fontSize: 9 }}>
               {messages.length} msg
@@ -917,6 +919,10 @@ const GameScreen = ({ token, user, roomCode, isSolo, onFinished, backendGame, ga
               allowRestart={isSolo && !soloResult}
               themeAccent={themeAccent}
               themeSecondary={themeSecondary}
+              roomCode={isSolo ? null : roomCode}
+              userId={user?.id}
+              players={room?.players}
+              token={token}
             />
           </motion.div>
 
@@ -936,9 +942,9 @@ const GameScreen = ({ token, user, roomCode, isSolo, onFinished, backendGame, ga
               <motion.div
                 initial={{ scale: 0.5, rotate: -10 }} animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 14 }}
-                style={{ fontSize: 64, filter: `drop-shadow(0 6px 24px ${accent}66)` }}
+                style={{ display: 'inline-flex', justifyContent: 'center', color: accent, filter: `drop-shadow(0 6px 24px ${accent}66)` }}
               >
-                🎯
+                <iconify-icon icon="tabler:target-arrow" width="64" />
               </motion.div>
               <div style={{ fontWeight: 900, fontSize: 28, color: '#fff', letterSpacing: '-0.04em', textAlign: 'center' }}>
                 Run complete
@@ -1029,10 +1035,10 @@ const GameScreen = ({ token, user, roomCode, isSolo, onFinished, backendGame, ga
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'Mode', value: isSolo ? 'Solo' : 'Multiplayer', icon: '🎮' },
-                { label: 'Difficulty', value: 'Adaptive', icon: '🧠' },
-                { label: 'Multiplier', value: '1.2×', icon: '⚡' },
-                { label: 'Elapsed', value: formatTime(elapsed), icon: '⏱' },
+                { label: 'Mode', value: isSolo ? 'Solo' : 'Multiplayer', icon: 'tabler:device-gamepad-2' },
+                { label: 'Difficulty', value: 'Adaptive', icon: 'tabler:brain' },
+                { label: 'Multiplier', value: '1.2×', icon: 'tabler:bolt' },
+                { label: 'Elapsed', value: formatTime(elapsed), icon: 'tabler:clock' },
               ].map((stat) => (
                 <div key={stat.label} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -1041,7 +1047,7 @@ const GameScreen = ({ token, user, roomCode, isSolo, onFinished, backendGame, ga
                   border: '1px solid rgba(255,255,255,0.05)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 14 }}>{stat.icon}</span>
+                    <iconify-icon icon={stat.icon} width="14" style={{ color: 'rgba(235,235,235,0.6)' }} />
                     <span style={{ fontSize: 12, color: 'rgba(235,235,235,0.55)', fontWeight: 600 }}>{stat.label}</span>
                   </div>
                   <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: '#fff' }}>{stat.value}</span>
@@ -1154,9 +1160,17 @@ const ResultScreen = ({ room, user, onPlayAgain, onLobby, roomCode, theme = DEFA
           <motion.div
             initial={{ scale: 0.4, rotate: -10 }} animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 220, damping: 14 }}
-            style={{ fontSize: 64, marginBottom: 10, filter: 'drop-shadow(0 6px 20px rgba(255,215,0,0.5))' }}
+            style={{
+              marginBottom: 10,
+              display: 'inline-flex', justifyContent: 'center',
+              color: meWon ? '#FFD700' : meIndex === 1 ? '#C0C0C0' : meIndex === 2 ? '#CD7F32' : accent,
+              filter: meWon ? 'drop-shadow(0 6px 20px rgba(255,215,0,0.5))' : `drop-shadow(0 6px 20px ${accent}55)`,
+            }}
           >
-            {meWon ? '🏆' : meIndex === 1 ? '🥈' : meIndex === 2 ? '🥉' : '🎯'}
+            <iconify-icon
+              icon={meWon ? 'tabler:trophy' : meIndex === 1 ? 'tabler:medal-2' : meIndex === 2 ? 'tabler:award' : 'tabler:target-arrow'}
+              width="64"
+            />
           </motion.div>
           <div className="arena-pill" style={{ background: `${accent}10`, borderColor: `${accent}40`, color: accent, marginBottom: 12 }}>
             <span className="arena-dot" /> Match complete
@@ -1192,8 +1206,8 @@ const ResultScreen = ({ room, user, onPlayAgain, onLobby, roomCode, theme = DEFA
                   className={`podium-step ${cls}`}
                 >
                   <Avatar name={p.name} url={p.avatar_url} size={52} accent={idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : '#CD7F32'} glow={idx === 0} />
-                  <div className="podium-rank" style={{ marginTop: 10, color: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : '#CD7F32' }}>
-                    {['🥇', '🥈', '🥉'][idx]}
+                  <div className="podium-rank" style={{ marginTop: 10, color: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : '#CD7F32', display: 'inline-flex', justifyContent: 'center' }}>
+                    <iconify-icon icon={idx === 0 ? 'tabler:trophy-filled' : idx === 1 ? 'tabler:medal-2' : 'tabler:award'} width="36" />
                   </div>
                   <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {p.name}
@@ -1222,7 +1236,7 @@ const ResultScreen = ({ room, user, onPlayAgain, onLobby, roomCode, theme = DEFA
           </div>
           {players.map((p, i) => {
             const isSelf = p.id === user?.id;
-            const rankIcon = ['🥇', '🥈', '🥉'][i] || `#${i + 1}`;
+            const top3Icon = ['tabler:trophy-filled', 'tabler:medal-2', 'tabler:award'][i];
             return (
               <motion.div
                 key={p.id}
@@ -1231,8 +1245,10 @@ const ResultScreen = ({ room, user, onPlayAgain, onLobby, roomCode, theme = DEFA
                 className={`player-tile ${isSelf ? 'is-self' : ''}`}
                 style={{ borderRadius: 0, background: isSelf ? `${accent}08` : 'transparent', borderTop: '1px solid rgba(255,255,255,0.04)', borderColor: 'transparent' }}
               >
-                <div style={{ width: 28, textAlign: 'center', fontWeight: 800, fontFamily: MONO, color: i < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][i] : 'rgba(235,235,235,0.5)' }}>
-                  {rankIcon}
+                <div style={{ width: 32, display: 'grid', placeItems: 'center', color: i < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][i] : 'rgba(235,235,235,0.5)' }}>
+                  {top3Icon
+                    ? <iconify-icon icon={top3Icon} width="20" />
+                    : <span style={{ fontSize: 13, fontWeight: 800, fontFamily: MONO }}>#{i + 1}</span>}
                 </div>
                 <Avatar name={p.name} url={p.avatar_url} size={36} accent={isSelf ? accent : '#fff'} />
                 <div style={{ minWidth: 0 }}>
@@ -1281,17 +1297,17 @@ const ResultScreen = ({ room, user, onPlayAgain, onLobby, roomCode, theme = DEFA
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             {[
-              { label: 'Time', value: '—', icon: '⏱' },
-              { label: 'Rank', value: myRankLabel, icon: '🏅' },
+              { label: 'Time', value: '—', icon: 'tabler:clock' },
+              { label: 'Rank', value: myRankLabel, icon: 'tabler:medal' },
             ].map((s) => (
               <div key={s.label} style={{
-                padding: '8px 14px', borderRadius: 10,
+                padding: '10px 14px', borderRadius: 10,
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.06)',
-                textAlign: 'center',
+                textAlign: 'center', minWidth: 64,
               }}>
-                <div style={{ fontSize: 12 }}>{s.icon}</div>
-                <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 800, color: '#fff', marginTop: 2 }}>{s.value}</div>
+                <iconify-icon icon={s.icon} width="14" style={{ color: 'rgba(235,235,235,0.6)' }} />
+                <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 800, color: '#fff', marginTop: 4 }}>{s.value}</div>
               </div>
             ))}
           </div>
@@ -1340,7 +1356,14 @@ const MatchRoomPage = () => {
   }, [tournamentSlug, gameSlug, roomGame]);
 
   const themeUI = useMemo(
-    () => ({ accent: tournament.accent, secondary: tournament.secondary, label: tournament.label, emoji: tournament.emoji }),
+    () => ({
+      accent: tournament.accent,
+      secondary: tournament.secondary,
+      label: tournament.label,
+      icon: tournament.icon,
+      iconAlt: tournament.iconAlt,
+      tagline: tournament.tagline,
+    }),
     [tournament]
   );
 
@@ -1388,7 +1411,7 @@ const MatchRoomPage = () => {
     if (roomCodeRef.current && !isSoloRef.current && token) {
       navigator.sendBeacon(`${API_BASE_URL}/rooms/${roomCodeRef.current}/leave?token=${token}`);
     }
-    navigate('/lobby');
+    navigate(`/lobby/${tournament.slug}`);
   };
 
   const handleSolo = () => {
@@ -1398,7 +1421,7 @@ const MatchRoomPage = () => {
     setPhase('playing');
   };
 
-  const handleFriend = () => navigate('/lobby');
+  const handleFriend = () => navigate(`/lobby/${tournament.slug}`);
 
   const handleMatchStart = (code, room) => {
     setRoomCode(code); setRoomData(room); setPhase('playing');

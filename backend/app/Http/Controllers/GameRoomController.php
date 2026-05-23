@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ChatMessageSent;
 use App\Events\RoomUpdated;
 use App\Events\GameInviteEvent;
+use App\Events\GameMoveBroadcast;
 use App\Models\GameInvite;
 use App\Models\GameRoom;
 use App\Models\GameRoomPlayer;
@@ -316,6 +317,44 @@ class GameRoomController extends Controller
         return response()->json(['message' => $payload]);
     }
 
+    /* ── POST /api/rooms/{code}/move — Real-time game move relay ─ */
+    public function relayMove(Request $request, string $code)
+    {
+        $request->validate([
+            'type'    => 'required|string|max:32',     // e.g. 'move', 'reset', 'resign'
+            'payload' => 'required|array',             // game-specific data
+        ]);
+
+        $user = $this->authUser();
+        $room = $this->findRoom($code);
+
+        // Caller must be in the room
+        $isMember = $room->players()->where('user_id', $user->id)->exists();
+        if (!$isMember) {
+            return response()->json(['error' => 'Not in room'], 403);
+        }
+
+        $broadcastPayload = [
+            'type'      => $request->type,
+            'payload'   => $request->payload,
+            'from_user' => [
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'gamer_tag'  => $user->gamer_tag,
+                'avatar_url' => $user->avatar_url,
+            ],
+            'sent_at'   => now()->toIso8601String(),
+        ];
+
+        try {
+            broadcast(new GameMoveBroadcast($room->code, $broadcastPayload))->toOthers();
+        } catch (\Throwable $e) {
+            \Log::error('Broadcast failed in GameRoom relayMove: '.$e->getMessage());
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
     /* ── POST /api/rooms/{code}/score ──────────────────────── */
     public function submitScore(Request $request, string $code)
     {
@@ -341,6 +380,21 @@ class GameRoomController extends Controller
             'won'       => false, // determined after all scores in
             'played_at' => now(),
         ]);
+
+        // Broadcast leaderboard refresh signal (fire-and-forget)
+        try {
+            broadcast(new \App\Events\LeaderboardUpdated([
+                'game'      => $room->game ?? 'snake',
+                'user_id'   => $user->id,
+                'user_name' => $user->name,
+                'score'     => (int) $request->score,
+                'reason'    => 'multiplayer',
+                'room'      => $room->code,
+                'at'        => now()->toIso8601String(),
+            ]));
+        } catch (\Throwable $e) {
+            \Log::warning('Leaderboard broadcast failed: '.$e->getMessage());
+        }
 
         // Check if all players have submitted scores
         $room->load('players.user');

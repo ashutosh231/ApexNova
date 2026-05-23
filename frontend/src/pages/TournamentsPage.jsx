@@ -1,34 +1,26 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ALL_TOURNAMENTS, buildFilters } from '../data/allTournaments.js';
+import { buildFilters } from '../data/allTournaments.js';
 import { getTournamentConfig, syncSessionFromTournament } from '../data/tournamentConfig.js';
+import { useTournaments } from '../hooks/useTournaments.js';
 
 const LIME = '#ccff00';
 const PURPLE = '#bd00ff';
 const CYAN = '#00f0ff';
 const PINK = '#fb7185';
 const MONO = "'JetBrains Mono', monospace";
-const BLOOM_FILTERS = buildFilters(ALL_TOURNAMENTS);
 
-/* ── Theme per game ─────────────────────────────────── */
 const GAME_THEME = {
-  'snake-championship': { c1: '#ccff00', c2: '#10b981', emoji: '🐍' },
-  'tictactoe-masters': { c1: '#f97316', c2: '#ef4444', emoji: '❌' },
-  'memory-grand-prix': { c1: '#a78bfa', c2: '#7c3aed', emoji: '🧠' },
-  'number-guessing-open': { c1: '#facc15', c2: '#f59e0b', emoji: '🔢' },
-  'pixel-memory-ultra': { c1: '#00ffff', c2: '#ff00ff', emoji: '🧩' },
-  'chess-blitz-open': { c1: '#60a5fa', c2: '#6366f1', emoji: '♟️' },
+  'snake-championship': { c1: '#ccff00', c2: '#10b981' },
+  'tictactoe-masters': { c1: '#f97316', c2: '#ef4444' },
+  'memory-grand-prix': { c1: '#a78bfa', c2: '#7c3aed' },
+  'number-guessing-open': { c1: '#facc15', c2: '#f59e0b' },
+  'pixel-memory-ultra': { c1: '#00ffff', c2: '#ff00ff' },
+  'chess-blitz-open': { c1: '#60a5fa', c2: '#6366f1' },
 };
 
-/* ── Helpers ─────────────────────────────────────────── */
-function fillPct(str) {
-  const [a, b] = str.split('/');
-  const cur = parseInt(a.replace(/,/g, ''), 10);
-  const max = parseInt(b.trim().replace(/,/g, ''), 10);
-  if (!max) return 0;
-  return Math.min(100, Math.round((cur / max) * 100));
-}
+const CATEGORIES = ['All', 'Arcade', 'Strategy', 'Puzzle'];
 
 function tagColor(tag) {
   if (tag === 'LIVE') return { bg: 'rgba(204,255,0,0.14)', border: 'rgba(204,255,0,0.55)', text: LIME };
@@ -43,246 +35,180 @@ function diffColor(d) {
   return '#f59e0b';
 }
 
-/* ── Tournament Card ──────────────────────────────────── */
-function TournamentCard({ t, index, large = false }) {
+function cardTheme(t) {
+  if (t.accent && t.secondary) return { c1: t.accent, c2: t.secondary };
+  return GAME_THEME[t.id] || { c1: LIME, c2: '#10b981' };
+}
+
+function TournamentCard({ t, index }) {
   const navigate = useNavigate();
   const reduced = useReducedMotion();
-  const [hovered, setHovered] = useState(false);
-  const pct = fillPct(t.players);
-  const tc = tagColor(t.tagLabel);
-  const theme = GAME_THEME[t.id] || { c1: LIME, c2: '#10b981' };
-  const c1 = theme.c1;
-  const c2 = theme.c2;
+  const pct = t.fill_percent ?? 0;
+  const tag = t.tagLabel ?? t.tag_label ?? 'OPEN';
+  const tc = tagColor(tag);
+  const { c1, c2 } = cardTheme(t);
+  const isLive = t.isLive ?? t.is_live;
+  const cfg = getTournamentConfig(t.id);
+  const gameIcon = cfg.icon || 'tabler:device-gamepad-2';
 
   const handleJoin = (e) => {
-    if (e) e.stopPropagation();
+    e?.stopPropagation();
     syncSessionFromTournament(t.id);
-    const cfg = getTournamentConfig(t.id);
-    navigate(cfg.usesMemoryShell ? `/memory-match-room?tournament=${t.id}` : `/match-room?tournament=${t.id}`);
+    navigate(`/lobby/${cfg.slug}`);
   };
 
   return (
     <motion.article
-      initial={reduced ? false : { opacity: 0, y: 22 }}
+      className="tournament-card"
+      style={{ '--tc-accent': c1, '--tc-secondary': c2 }}
+      initial={reduced ? false : { opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: index * 0.06 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: index * 0.05 }}
       onClick={handleJoin}
-      style={{
-        position: 'relative',
-        borderRadius: 22,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        background: '#0a0a0c',
-        border: `1px solid ${hovered ? `${c1}55` : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: hovered
-          ? `0 30px 70px -20px rgba(0,0,0,0.7), 0 0 50px -10px ${c1}30, inset 0 0 0 1px ${c1}22`
-          : '0 12px 36px -12px rgba(0,0,0,0.5)',
-        transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
-        transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, box-shadow 0.4s ease',
-        minHeight: large ? 380 : 340,
-        display: 'flex', flexDirection: 'column',
-      }}
+      layout
     >
-      {/* Image area */}
-      <div style={{ position: 'relative', height: large ? 220 : 180, overflow: 'hidden', flexShrink: 0 }}>
-        <img
-          src={t.coverImage}
-          alt={t.name}
-          loading="lazy"
+      <motion.div className="tournament-card-media" layout="position">
+        <img src={t.coverImage ?? t.cover_image} alt={t.name} loading="lazy" />
+        <motion.div
+          aria-hidden
           style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover',
-            filter: 'saturate(1.15) contrast(1.05)',
-            transform: hovered ? 'scale(1.08)' : 'scale(1.02)',
-            transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+            position: 'absolute',
+            inset: 0,
+            background: `
+              linear-gradient(180deg, transparent 0%, rgba(6,6,8,0.5) 55%, rgba(6,6,8,0.98) 100%),
+              radial-gradient(ellipse 70% 50% at 0% 0%, ${c1}28, transparent 65%)
+            `,
           }}
         />
-        {/* Multi-layer gradient overlay */}
-        <div aria-hidden style={{
-          position: 'absolute', inset: 0,
-          background: `
-            linear-gradient(180deg, rgba(10,10,12,0) 0%, rgba(10,10,12,0.4) 60%, rgba(10,10,12,1) 100%),
-            radial-gradient(ellipse 80% 60% at 30% 0%, ${c1}22 0%, transparent 60%),
-            radial-gradient(ellipse 60% 50% at 100% 100%, ${c2}1a 0%, transparent 70%)
-          `,
-        }} />
-        {/* Diagonal scanline that animates on hover */}
-        <div aria-hidden style={{
-          position: 'absolute', top: '-50%', left: '-25%', width: '150%', height: 2,
-          background: `linear-gradient(90deg, transparent, ${c1}99, transparent)`,
-          transform: hovered ? 'translateY(180px) rotate(-8deg)' : 'translateY(-100px) rotate(-8deg)',
-          transition: 'transform 0.9s cubic-bezier(0.16,1,0.3,1)',
-          opacity: hovered ? 0.7 : 0,
-          filter: 'blur(1px)',
-        }} />
-
-        {/* Status pill */}
         <div style={{
-          position: 'absolute', top: 14, left: 14,
+          position: 'absolute', top: 12, left: 12,
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '6px 12px', borderRadius: 999,
-          background: `linear-gradient(135deg, ${tc.bg}, rgba(0,0,0,0.4))`,
-          border: `1px solid ${tc.border}`,
-          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-          fontFamily: MONO, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
-          color: tc.text, textTransform: 'uppercase',
-          boxShadow: `0 4px 12px -4px ${tc.text}66`,
-        }}>
-          {t.isLive && <span style={{ width: 6, height: 6, borderRadius: '50%', background: tc.text, boxShadow: `0 0 8px ${tc.text}`, animation: 'arenaDot 1.4s ease-in-out infinite' }} />}
-          {t.tagLabel}
-        </div>
-
-        {/* Time chip */}
-        <div style={{
-          position: 'absolute', top: 14, right: 14,
-          padding: '6px 12px', borderRadius: 999,
-          background: 'rgba(0,0,0,0.55)',
-          border: '1px solid rgba(255,255,255,0.10)',
+          padding: '5px 11px', borderRadius: 999,
+          background: tc.bg, border: `1px solid ${tc.border}`,
           backdropFilter: 'blur(10px)',
-          fontFamily: MONO, fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
+          fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+          color: tc.text, textTransform: 'uppercase',
+        }}>
+          {isLive && <span className="arena-dot" style={{ width: 5, height: 5 }} />}
+          {tag}
+        </div>
+        <motion.div style={{
+          position: 'absolute', top: 12, right: 12,
+          padding: '5px 10px', borderRadius: 999,
+          background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.1)',
+          fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: '0.08em',
           color: 'rgba(235,235,235,0.85)',
           display: 'inline-flex', alignItems: 'center', gap: 4,
         }}>
-          <iconify-icon icon="lucide:clock" width="11" />
-          {t.timeLeft}
-        </div>
-
-        {/* Game emoji watermark */}
-        <div style={{
-          position: 'absolute', right: -8, bottom: -8,
-          fontSize: large ? 110 : 90,
-          opacity: 0.18,
-          filter: `drop-shadow(0 0 30px ${c1})`,
-          pointerEvents: 'none',
-          transform: hovered ? 'translate(-4px, -4px) scale(1.08) rotate(-6deg)' : 'translate(0, 0) scale(1) rotate(-3deg)',
-          transition: 'transform 0.5s cubic-bezier(0.16,1,0.3,1)',
+          <iconify-icon icon="lucide:clock" width="10" />
+          {t.timeLeft ?? t.time_left}
+        </motion.div>
+        <motion.span style={{
+          position: 'absolute', right: 14, bottom: 10,
+          opacity: 0.22, lineHeight: 1,
+          color: c1,
+          filter: `drop-shadow(0 0 24px ${c1})`,
+          display: 'inline-flex',
         }}>
-          {t.emoji}
-        </div>
-      </div>
+          <iconify-icon icon={gameIcon} width="78" />
+        </motion.span>
+      </motion.div>
 
-      {/* Body */}
-      <div style={{ position: 'relative', padding: '20px 22px 22px', display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
-        {/* Top row: chips */}
+      <div className="tournament-card-body">
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <span style={{
-            fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: 'rgba(235,235,235,0.6)',
-            padding: '4px 9px', borderRadius: 6,
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: 'rgba(235,235,235,0.55)', padding: '3px 8px', borderRadius: 6,
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
           }}>{t.game}</span>
           <span style={{
-            fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: diffColor(t.difficulty),
-            padding: '4px 9px', borderRadius: 6,
-            background: `${diffColor(t.difficulty)}12`,
-            border: `1px solid ${diffColor(t.difficulty)}40`,
+            fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            color: diffColor(t.difficulty), padding: '3px 8px', borderRadius: 6,
+            background: `${diffColor(t.difficulty)}12`, border: `1px solid ${diffColor(t.difficulty)}35`,
           }}>{t.difficulty}</span>
         </div>
 
-        {/* Title */}
         <h3 style={{
-          margin: 0,
-          fontWeight: 800,
-          fontSize: large ? 22 : 18,
-          letterSpacing: '-0.04em',
-          color: '#fff',
-          lineHeight: 1.15,
-          display: 'flex', alignItems: 'center', gap: 8,
+          margin: 0, fontWeight: 800, fontSize: 17, letterSpacing: '-0.04em',
+          color: '#fff', lineHeight: 1.2,
+          display: 'flex', alignItems: 'center', gap: 10,
         }}>
-          <span style={{ fontSize: large ? 24 : 20 }}>{t.emoji}</span>
-          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {t.name}
+          <span style={{
+            width: 28, height: 28, borderRadius: 8,
+            background: `${c1}18`, border: `1px solid ${c1}40`,
+            display: 'grid', placeItems: 'center',
+            color: c1, flexShrink: 0,
+          }}>
+            <iconify-icon icon={gameIcon} width="16" />
           </span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
         </h3>
 
-        {/* Stats row */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12,
-          padding: '12px 14px',
-          background: 'rgba(255,255,255,0.025)',
-          border: '1px solid rgba(255,255,255,0.05)',
-          borderRadius: 12,
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
+          padding: '10px 12px', borderRadius: 12,
+          background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)',
         }}>
-          <div>
-            <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.40)', marginBottom: 3 }}>
-              Players
-            </div>
-            <div style={{ fontWeight: 700, fontSize: 13, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <iconify-icon icon="lucide:users" width="13" style={{ color: 'rgba(235,235,235,0.5)' }} />
+          <motion.div>
+            <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.38)', marginBottom: 2 }}>Players</div>
+            <div style={{ fontWeight: 700, fontSize: 12, color: '#fff', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <iconify-icon icon="lucide:users" width="12" style={{ opacity: 0.5 }} />
               {t.players}
             </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.40)', marginBottom: 3 }}>
-              Prize Pool
-            </div>
-            <div style={{ fontWeight: 900, fontSize: 16, color: c1, letterSpacing: '-0.02em', textShadow: `0 0 16px ${c1}55` }}>
-              {t.prize}
-            </div>
-          </div>
+          </motion.div>
+          <motion.div style={{ textAlign: 'right' }}>
+            <motion.div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.38)', marginBottom: 2 }}>Prize</motion.div>
+            <div style={{ fontWeight: 900, fontSize: 15, color: c1, letterSpacing: '-0.02em', textShadow: `0 0 14px ${c1}44` }}>{t.prize}</div>
+          </motion.div>
         </div>
 
-        {/* Progress bar */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.4)' }}>
-              Filled
-            </span>
-            <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 800, color: c1 }}>
-              {pct}%
-            </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.38)' }}>Filled</span>
+            <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: c1 }}>{pct}%</span>
           </div>
-          <div style={{ height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+          <div style={{ height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
             <div style={{
               height: '100%', width: `${pct}%`, borderRadius: 999,
               background: `linear-gradient(90deg, ${c1}, ${c2})`,
-              boxShadow: `0 0 10px ${c1}66`,
-              transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)',
+              boxShadow: `0 0 8px ${c1}55`,
             }} />
           </div>
         </div>
 
-        {/* CTA */}
         <button
+          type="button"
           onClick={handleJoin}
+          className="arena-btn"
           style={{
-            marginTop: 'auto',
-            width: '100%',
-            padding: '13px 0',
-            border: 'none',
-            borderRadius: 12,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontWeight: 800, fontSize: 13,
-            letterSpacing: '0.02em',
-            color: '#0a0a0c',
-            background: `linear-gradient(135deg, ${c1}, ${c2})`,
-            boxShadow: hovered
-              ? `0 14px 36px -8px ${c1}, 0 0 0 1px rgba(255,255,255,0.15) inset`
-              : `0 8px 26px -8px ${c1}aa, 0 0 0 1px rgba(255,255,255,0.1) inset`,
-            transition: 'box-shadow 0.3s ease, transform 0.2s ease',
-            transform: hovered ? 'translateY(-1px)' : 'translateY(0)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            marginTop: 'auto', width: '100%', padding: '12px 0',
+            '--btn-color': c1, '--btn-color-2': c2,
+            fontSize: 12,
           }}
         >
-          <iconify-icon icon="lucide:swords" width="16" />
+          <iconify-icon icon="lucide:swords" width="15" />
           Join Tournament
-          <iconify-icon icon="lucide:arrow-right" width="14" style={{ transform: hovered ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 0.3s ease' }} />
         </button>
       </div>
     </motion.article>
   );
 }
 
-/* ── Main Page ─────────────────────────────────────── */
 const TournamentsPage = () => {
   const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('All');
   const searchRef = useRef(null);
   const reduced = useReducedMotion();
+  const { tournaments, meta, loading } = useTournaments();
+
+  const bloomFilters = useMemo(() => buildFilters(
+    tournaments.map((t) => ({
+      ...t,
+      tagLabel: t.tagLabel ?? t.tag_label,
+      isLive: t.isLive ?? t.is_live,
+      coverImage: t.coverImage ?? t.cover_image,
+    }))
+  ), [tournaments]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -297,27 +223,28 @@ const TournamentsPage = () => {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return ALL_TOURNAMENTS;
-    const tokens = q.split(/\s+/);
-    return ALL_TOURNAMENTS.filter((t, idx) => {
-      const bf = BLOOM_FILTERS[idx];
-      if (!tokens.every((tok) => bf.mightContain(tok))) return false;
-      const hay = `${t.name} ${t.game} ${t.category} ${t.difficulty} ${t.tagLabel}`.toLowerCase();
+    const tokens = q ? q.split(/\s+/) : [];
+
+    return tournaments.filter((t, idx) => {
+      if (category !== 'All' && t.category !== category) return false;
+      if (!tokens.length) return true;
+      const bf = bloomFilters[idx];
+      if (bf && !tokens.every((tok) => bf.mightContain(tok))) return false;
+      const hay = `${t.name} ${t.game} ${t.category} ${t.difficulty} ${t.tagLabel ?? t.tag_label}`.toLowerCase();
       return tokens.every((tok) => hay.includes(tok));
     });
-  }, [query]);
+  }, [query, category, tournaments, bloomFilters]);
 
-  const liveCount = filtered.filter((t) => t.isLive).length;
-  const totalPrize = filtered.reduce((s, t) => s + parseInt(t.prize.replace(/[^0-9]/g, ''), 10), 0);
+  const liveCount = meta.live_count ?? filtered.filter((t) => t.isLive ?? t.is_live).length;
+  const totalPrize = meta.total_prize ?? filtered.reduce((s, t) => s + parseInt((t.prize || '').replace(/[^0-9]/g, ''), 10), 0);
 
   return (
-    <div
-      className="arena-shell"
+    <motion.div
+      className="arena-shell tournaments-page"
       style={{
         '--arena-bloom-1': 'rgba(204,255,0,0.15)',
         '--arena-bloom-2': 'rgba(189,0,255,0.12)',
         '--arena-bloom-3': 'rgba(0,240,255,0.10)',
-        '--arena-bloom-4': 'rgba(168,85,247,0.10)',
         '--arena-orb-1': 'rgba(204,255,0,0.22)',
         '--arena-orb-2': 'rgba(189,0,255,0.18)',
         '--arena-orb-3': 'rgba(0,240,255,0.14)',
@@ -325,68 +252,59 @@ const TournamentsPage = () => {
       }}
     >
       <div className="arena-bg-layer">
-        <div className="arena-mesh" />
-        <div className="arena-grid" />
-        <div className="arena-orb arena-orb-1" />
-        <div className="arena-orb arena-orb-2" />
-        <div className="arena-orb arena-orb-3" />
-        <div className="arena-noise" />
+        <motion.div className="arena-mesh" />
+        <motion.div className="arena-grid" />
+        <motion.div className="arena-orb arena-orb-1" />
+        <motion.div className="arena-orb arena-orb-2" />
+        <motion.div className="arena-orb arena-orb-3" />
+        <motion.div className="arena-noise" />
       </div>
 
-      {/* ── Sticky top bar ── */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 50,
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-        background: 'rgba(6,6,8,0.85)',
+        background: 'rgba(6,6,8,0.88)',
       }}>
         <div style={{
-          maxWidth: 1400, margin: '0 auto',
-          padding: '14px 24px',
+          maxWidth: 1320, margin: '0 auto', padding: '14px 24px',
           display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
         }}>
           <Link to="/" className="arena-btn-ghost" style={{ textDecoration: 'none', padding: '8px 14px' }}>
             <iconify-icon icon="lucide:arrow-left" width="14" />
             Home
           </Link>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 10,
               background: `linear-gradient(135deg, ${LIME}, #10b981)`,
               display: 'grid', placeItems: 'center',
-              boxShadow: `0 4px 16px -4px ${LIME}`,
             }}>
-              <iconify-icon icon="lucide:gamepad-2" width="18" style={{ color: '#000' }} />
+              <iconify-icon icon="lucide:trophy" width="17" style={{ color: '#000' }} />
             </div>
-            <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.04em', color: '#fff' }}>
-              Apex<span style={{ color: LIME }}>Nova</span>
+            <div style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.04em', color: '#fff' }}>
+              Tournaments
             </div>
           </div>
-
-          {/* Search */}
-          <div style={{ flex: 1, minWidth: 200, position: 'relative', maxWidth: 380 }}>
-            <iconify-icon icon="lucide:search" width="14"
-              style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'rgba(235,235,235,0.4)', pointerEvents: 'none' }} />
+          <div style={{ flex: 1, minWidth: 200, maxWidth: 360, position: 'relative' }}>
+            <iconify-icon icon="lucide:search" width="14" style={{
+              position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
+              color: 'rgba(235,235,235,0.4)', pointerEvents: 'none',
+            }} />
             <input
               ref={searchRef}
               type="text"
-              placeholder='Search games… (press "/" to focus)'
+              placeholder='Search games… ("/")'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{
                 width: '100%', boxSizing: 'border-box',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)',
                 borderRadius: 999, padding: '10px 14px 10px 36px',
-                color: '#fff', fontSize: 13, fontFamily: 'inherit',
-                outline: 'none', transition: 'border-color 0.2s ease, background 0.2s ease',
+                color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none',
               }}
-              onFocus={(e) => { e.target.style.borderColor = `${LIME}55`; e.target.style.background = 'rgba(255,255,255,0.06)'; }}
-              onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.10)'; e.target.style.background = 'rgba(255,255,255,0.04)'; }}
             />
           </div>
-
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
             {liveCount > 0 && (
               <div className="arena-pill arena-pill-live">
@@ -394,215 +312,121 @@ const TournamentsPage = () => {
                 {liveCount} LIVE
               </div>
             )}
-            <div className="arena-pill">
-              {filtered.length} / {ALL_TOURNAMENTS.length} GAMES
-            </div>
+            <div className="arena-pill">{filtered.length} GAMES</div>
           </div>
         </div>
       </div>
 
-      {/* ── Hero Banner ── */}
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '36px 24px 0', position: 'relative', zIndex: 2 }}>
+      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 24px 0', position: 'relative', zIndex: 2 }}>
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 20 }}
+          className="arena-card-glow"
+          initial={reduced ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            position: 'relative',
-            borderRadius: 28,
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #0a0a0c 0%, #14141a 100%)',
+            '--glow-color': LIME,
+            '--glow-color-2': PURPLE,
+            borderRadius: 24, overflow: 'hidden', marginBottom: 32,
+            background: 'linear-gradient(145deg, rgba(10,10,12,0.95) 0%, rgba(18,18,24,0.98) 100%)',
             border: '1px solid rgba(255,255,255,0.08)',
-            padding: 'clamp(36px, 6vw, 64px) clamp(24px, 4vw, 56px)',
-            marginBottom: 36,
-            minHeight: 280,
-            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            padding: 'clamp(32px, 5vw, 52px) clamp(24px, 4vw, 48px)',
+            position: 'relative',
           }}
         >
-          {/* Layered backgrounds */}
           <div aria-hidden style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: `
-              radial-gradient(ellipse 60% 70% at 0% 0%, ${LIME}1c, transparent 60%),
-              radial-gradient(ellipse 50% 60% at 100% 100%, ${PURPLE}18, transparent 65%),
-              radial-gradient(ellipse 40% 50% at 100% 0%, ${CYAN}12, transparent 70%)
+              radial-gradient(ellipse 55% 60% at 0% 0%, ${LIME}18, transparent 55%),
+              radial-gradient(ellipse 45% 50% at 100% 100%, ${PURPLE}14, transparent 60%)
             `,
           }} />
-          {/* Grid pattern */}
-          <div aria-hidden style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            opacity: 0.4,
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
-            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 80%)',
-          }} />
-          {/* Animated light streak */}
-          <div aria-hidden style={{
-            position: 'absolute', top: '20%', left: '-20%', width: '140%', height: 1,
-            background: `linear-gradient(90deg, transparent, ${LIME}66, transparent)`,
-            transform: 'rotate(-2deg)',
-            animation: 'lightStreak 8s ease-in-out infinite',
-            opacity: 0.5,
-          }} />
-
-          <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 24, alignItems: 'center' }}>
+          <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 24, alignItems: 'center' }}>
             <div>
-              <motion.div
-                initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '6px 14px', borderRadius: 999,
-                  background: `linear-gradient(135deg, ${LIME}15, transparent)`,
-                  border: `1px solid ${LIME}40`,
-                  fontFamily: MONO, fontSize: 10, fontWeight: 800, letterSpacing: '0.18em',
-                  textTransform: 'uppercase', color: LIME,
-                  marginBottom: 18,
-                }}
-              >
-                <iconify-icon icon="lucide:zap" width="12" />
-                Season 03 · Live now
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                style={{
-                  margin: 0, fontWeight: 900,
-                  fontSize: 'clamp(2.4rem, 5.5vw, 4.4rem)',
-                  letterSpacing: '-0.06em', lineHeight: 0.95,
-                  color: '#fff',
-                }}
-              >
-                Pick your{' '}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14,
+                padding: '5px 12px', borderRadius: 999,
+                background: `${LIME}12`, border: `1px solid ${LIME}35`,
+                fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.16em',
+                textTransform: 'uppercase', color: LIME,
+              }}>
+                <iconify-icon icon="lucide:zap" width="11" />
+                {meta.season ?? 'Season 03'} · Live now
+              </div>
+              <h1 style={{
+                margin: 0, fontWeight: 900,
+                fontSize: 'clamp(2rem, 4.5vw, 3.6rem)',
+                letterSpacing: '-0.05em', lineHeight: 0.98, color: '#fff',
+              }}>
+                Choose your{' '}
                 <span style={{
-                  background: `linear-gradient(105deg, ${LIME} 0%, #fff 50%, ${PURPLE} 100%)`,
+                  background: `linear-gradient(105deg, ${LIME}, #fff 45%, ${CYAN})`,
                   WebkitBackgroundClip: 'text', backgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontStyle: 'italic',
-                }}>battle</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
-                style={{ marginTop: 14, fontSize: 16, color: 'rgba(235,235,235,0.6)', lineHeight: 1.6, maxWidth: 540 }}
-              >
-                6 competitive games · real-time leaderboards · live prize pools. Drop in solo, squad up with friends, climb global ranks.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-                style={{ display: 'flex', gap: 24, marginTop: 22, flexWrap: 'wrap' }}
-              >
+                  WebkitTextFillColor: 'transparent', fontStyle: 'italic',
+                }}>arena</span>
+              </h1>
+              <p style={{ marginTop: 12, fontSize: 15, color: 'rgba(235,235,235,0.58)', maxWidth: 480, lineHeight: 1.65 }}>
+                Six competitive games in a clean grid — join live brackets or register for upcoming events.
+              </p>
+              <motion.div style={{ display: 'flex', gap: 20, marginTop: 20, flexWrap: 'wrap' }}>
                 {[
-                  { label: 'Total prize pool', value: `$${totalPrize.toLocaleString()}`, color: LIME, icon: 'lucide:trophy' },
-                  { label: 'Live tournaments', value: liveCount, color: PINK, icon: 'lucide:radio' },
-                  { label: 'Active games', value: filtered.length, color: CYAN, icon: 'lucide:gamepad-2' },
+                  { label: 'Prize pool', value: `$${Number(totalPrize).toLocaleString()}`, color: LIME },
+                  { label: 'Live now', value: liveCount, color: PINK },
+                  { label: 'Games', value: filtered.length, color: CYAN },
                 ].map((s) => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10,
-                      background: `${s.color}15`, border: `1px solid ${s.color}40`,
-                      display: 'grid', placeItems: 'center',
-                    }}>
-                      <iconify-icon icon={s.icon} width="16" style={{ color: s.color }} />
-                    </div>
-                    <div>
-                      <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.4)' }}>
-                        {s.label}
-                      </div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '-0.02em' }}>
-                        {s.value}
-                      </div>
-                    </div>
+                  <div key={s.label}>
+                    <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(235,235,235,0.38)' }}>{s.label}</div>
+                    <motion.div style={{ fontWeight: 800, fontSize: 17, color: s.color, letterSpacing: '-0.02em' }}>{s.value}</motion.div>
                   </div>
                 ))}
               </motion.div>
             </div>
-
-            {/* Trophy/Controller icon block */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.7, rotate: -10 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 14 }}
-              style={{
-                width: 'clamp(120px, 20vw, 200px)',
-                aspectRatio: '1',
-                borderRadius: 28,
-                background: `radial-gradient(circle at 30% 30%, ${LIME}28, transparent 70%), radial-gradient(circle at 70% 70%, ${PURPLE}22, transparent 70%), rgba(255,255,255,0.03)`,
-                border: `1px solid ${LIME}30`,
-                display: 'grid', placeItems: 'center',
-                boxShadow: `0 20px 60px -10px ${LIME}30, inset 0 0 40px rgba(255,255,255,0.05)`,
-                position: 'relative', overflow: 'hidden',
-              }}
-            >
-              {/* Animated rings */}
-              <div aria-hidden style={{
-                position: 'absolute', inset: 8, borderRadius: '50%',
-                border: `1px dashed ${LIME}40`,
-                animation: 'spin 20s linear infinite',
-              }} />
-              <div aria-hidden style={{
-                position: 'absolute', inset: 22, borderRadius: '50%',
-                border: `1px dashed ${PURPLE}40`,
-                animation: 'spin 14s linear infinite reverse',
-              }} />
-              <iconify-icon
-                icon="lucide:trophy"
-                width="80"
-                style={{
-                  color: LIME,
-                  filter: `drop-shadow(0 0 20px ${LIME}88) drop-shadow(0 0 40px ${LIME}44)`,
-                  animation: 'floatBadge 3.5s ease-in-out infinite',
-                }}
-              />
-            </motion.div>
+            <div style={{
+              width: 100, height: 100, borderRadius: 22, display: 'grid', placeItems: 'center',
+              background: `radial-gradient(circle at 30% 30%, ${LIME}25, transparent 70%)`,
+              border: `1px solid ${LIME}30`,
+              boxShadow: `0 16px 48px -12px ${LIME}35`,
+            }}>
+              <iconify-icon icon="lucide:gamepad-2" width="48" style={{ color: LIME, filter: `drop-shadow(0 0 16px ${LIME}88)` }} />
+            </div>
           </div>
         </motion.div>
 
-        {/* ── Tournament Grid ── */}
-        {filtered.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            style={{
-              textAlign: 'center', padding: '80px 24px',
-              color: 'rgba(235,235,235,0.5)',
-            }}
-          >
-            <iconify-icon icon="lucide:search-x" width="64" style={{ color: 'rgba(235,235,235,0.3)', marginBottom: 16 }} />
-            <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: '#fff' }}>No games found</p>
-            <p style={{ fontSize: 14 }}>Try a different search term.</p>
-          </motion.div>
+        <div className="tournaments-filters">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`tournaments-filter-chip${category === cat ? ' is-active' : ''}`}
+              onClick={() => setCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="tournaments-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="tournament-skeleton" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '72px 24px', color: 'rgba(235,235,235,0.5)' }}>
+            <iconify-icon icon="lucide:search-x" width="56" style={{ opacity: 0.35, marginBottom: 12 }} />
+            <p style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 4 }}>No games found</p>
+            <p style={{ fontSize: 14 }}>Try another search or category.</p>
+          </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
-              gap: 18,
-            }}>
+            <motion.div className="tournaments-grid" layout>
               {filtered.map((t, i) => (
-                <TournamentCard key={t.id} t={t} index={i} large={i < 2} />
+                <TournamentCard key={t.id} t={t} index={i} />
               ))}
-            </div>
+            </motion.div>
           </AnimatePresence>
         )}
       </div>
-
-      {/* Keyframes */}
-      <style>{`
-        @keyframes lightStreak {
-          0%, 100% { transform: translateX(-30%) rotate(-2deg); opacity: 0; }
-          50% { transform: translateX(30%) rotate(-2deg); opacity: 0.7; }
-        }
-        @keyframes floatBadge {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-6px) rotate(2deg); }
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+    </motion.div>
   );
 };
 

@@ -26,6 +26,7 @@ import MatchRoomPage from './pages/MatchRoomPage.jsx';
 import MemoryMatchRoomPage from './pages/MemoryMatchRoomPage.jsx';
 import LobbyPage from './pages/LobbyPage.jsx';
 import MemoryLobbyPage from './pages/MemoryLobbyPage.jsx';
+import GameLobbyPage from './pages/GameLobbyPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import ScrollToTopButton from './components/ScrollToTopButton.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -153,6 +154,11 @@ const AppContent = () => {
         <Route path="/lobby" element={
           <ProtectedRoute>
             <LobbyPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/lobby/:slug" element={
+          <ProtectedRoute>
+            <GameLobbyPage />
           </ProtectedRoute>
         } />
         <Route path="/memory-match-room" element={

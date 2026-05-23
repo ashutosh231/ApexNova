@@ -7,25 +7,29 @@ import getEcho from '../lib/echo';
  *
  * setRoom() does a FULL replace (not merge) so stale player
  * data never lingers after a poll or refresh.
+ *
+ * onGameMove (optional) — fired for every '.game.move' broadcast
+ *   from another player. The handler receives the raw payload:
+ *   { type, payload, from_user, sent_at }.
+ *   Use this to relay chess/tic-tac-toe moves between clients.
  */
-export function useRoomChannel(roomCode, initialRoom = null) {
+export function useRoomChannel(roomCode, initialRoom = null, onGameMove = null) {
   const [room, setRoomState]    = useState(initialRoom);
   const [messages, setMessages] = useState([]);
   const channelRef              = useRef(null);
+  const moveHandlerRef          = useRef(onGameMove);
 
-  // Full replace — never merge, so removed players disappear immediately
+  useEffect(() => { moveHandlerRef.current = onGameMove; }, [onGameMove]);
+
   const setRoom = useCallback((data) => {
     if (!data) return;
     setRoomState(data);
   }, []);
 
-  // Merge only specific fields from a WS event (status, players array, etc.)
-  // This handles partial event payloads from Reverb without wiping everything
   const mergeRoom = useCallback((data) => {
     setRoomState(prev => {
-      if (!prev) return data;           // first update — just set it
+      if (!prev) return data;
       if (!data) return prev;
-      // If the event contains a full players array, replace it entirely
       return { ...prev, ...data };
     });
   }, []);
@@ -46,6 +50,12 @@ export function useRoomChannel(roomCode, initialRoom = null) {
       channel.listen('.match.finished',  (d) => setRoom(d));
       channel.listen('.score.submitted', (d) => mergeRoom(d));
       channel.listen('.chat.message',    (msg) => setMessages(prev => [...prev, msg]));
+      channel.listen('.game.move',       (data) => {
+        const fn = moveHandlerRef.current;
+        if (typeof fn === 'function') {
+          try { fn(data); } catch (err) { console.warn('[useRoomChannel] onGameMove handler error:', err); }
+        }
+      });
 
       channel.error((err) => {
         console.warn('[useRoomChannel] channel error:', err);
@@ -61,6 +71,7 @@ export function useRoomChannel(roomCode, initialRoom = null) {
         channel?.stopListening('.match.finished');
         channel?.stopListening('.score.submitted');
         channel?.stopListening('.chat.message');
+        channel?.stopListening('.game.move');
         echo.leave(`room.${roomCode}`);
       } catch {}
       channelRef.current = null;

@@ -107,6 +107,20 @@ class ProfileController extends Controller
         $pts = intdiv($request->score, 10);
         if ($pts > 0) $user->increment('points', $pts);
 
+        // Notify the global leaderboard channel so connected clients refresh.
+        try {
+            broadcast(new \App\Events\LeaderboardUpdated([
+                'game'      => $game,
+                'user_id'   => $user->id,
+                'user_name' => $user->name,
+                'score'     => (int) $request->score,
+                'reason'    => 'solo',
+                'at'        => now()->toIso8601String(),
+            ]));
+        } catch (\Throwable $e) {
+            \Log::warning('Leaderboard broadcast failed: '.$e->getMessage());
+        }
+
         return response()->json([
             'message'       => 'Score saved',
             'points_earned' => $pts,

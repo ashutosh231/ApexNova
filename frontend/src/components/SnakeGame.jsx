@@ -234,8 +234,11 @@ const SnakeGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRes
           <div style={{
             width: 32, height: 32, borderRadius: 8,
             background: `${ACCENT}15`, border: `1px solid ${ACCENT}35`,
-            display: 'grid', placeItems: 'center', fontSize: 16,
-          }}>🐍</div>
+            display: 'grid', placeItems: 'center',
+            color: ACCENT,
+          }}>
+            <iconify-icon icon="mdi:snake" width="18" />
+          </div>
           <div>
             <div style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '-0.02em' }}>{playerName}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -284,7 +287,9 @@ const SnakeGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRes
         {/* Idle overlay */}
         {status === 'idle' && countdown === null && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,8,0.8)', backdropFilter: 'blur(4px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
-            <div style={{ fontSize: 56, filter: `drop-shadow(0 0 20px ${ACCENT}66)` }}>🐍</div>
+            <div style={{ display: 'inline-flex', justifyContent: 'center', color: ACCENT, filter: `drop-shadow(0 0 20px ${ACCENT}66)` }}>
+              <iconify-icon icon="mdi:snake" width="64" />
+            </div>
             <button onClick={runCountdown}
               style={{
                 background: `linear-gradient(135deg, ${ACCENT}, ${SEC})`, color: '#000',
@@ -292,11 +297,13 @@ const SnakeGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRes
                 fontSize: 16, fontWeight: 800, cursor: 'pointer',
                 boxShadow: `0 8px 30px -8px ${ACCENT}, 0 0 0 1px rgba(255,255,255,0.1) inset`,
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
               }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 14px 40px -8px ${ACCENT}`; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 8px 30px -8px ${ACCENT}`; }}
             >
-              ▶ Start Game
+              <iconify-icon icon="tabler:player-play-filled" width="16" />
+              Start Game
             </button>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.08em' }}>Arrow keys or WASD to move</div>
           </div>
@@ -305,7 +312,9 @@ const SnakeGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRes
         {/* Dead overlay */}
         {status === 'dead' && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,8,0.88)', backdropFilter: 'blur(6px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
-            <div style={{ fontSize: 40, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}>💀</div>
+            <div style={{ display: 'inline-flex', justifyContent: 'center', color: '#fb7185', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}>
+              <iconify-icon icon="tabler:skull" width="48" />
+            </div>
             <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>Game Over</div>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 36, fontWeight: 900, color: ACCENT, textShadow: `0 0 30px ${ACCENT}66` }}>{score.toLocaleString()}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em', textTransform: 'uppercase' }}>Final score</div>
@@ -316,11 +325,13 @@ const SnakeGame = ({ onGameOver, playerName = 'You', autoStart = false, allowRes
                   border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12,
                   padding: '10px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginTop: 6,
                   transition: 'all 0.2s ease',
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = `${ACCENT}15`; e.currentTarget.style.borderColor = `${ACCENT}40`; e.currentTarget.style.color = ACCENT; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#fff'; }}
               >
-                ↻ Play Again
+                <iconify-icon icon="tabler:refresh" width="14" />
+                Play Again
               </button>
             ) : (
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 8, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.1em' }}>
