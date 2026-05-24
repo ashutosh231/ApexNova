@@ -1,5 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { gameMedia } from '../data/gameMedia.js';
 
 const LIME = '#ccff00';
@@ -82,6 +83,7 @@ const glass = {
 
 const TournamentCard = ({ t, index, coverUrl, reduced }) => {
   const cardRef = useRef(null);
+  const navigate = useNavigate();
   const pct = fillPct(t.players);
   const src = coverUrl || DEFAULT_TOURNAMENT_COVER;
 
@@ -257,7 +259,7 @@ const TournamentCard = ({ t, index, coverUrl, reduced }) => {
             }}
           />
         </div>
-        <button type="button" data-cursor="hover" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+        <button type="button" onClick={() => navigate('/tournaments')} data-cursor="hover" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
           Join tournament
         </button>
       </div>
@@ -341,6 +343,7 @@ const TournamentCard = ({ t, index, coverUrl, reduced }) => {
 
 const Tournaments = () => {
   const reduced = useReducedMotion();
+  const navigate = useNavigate();
   const byGame = useMemo(() => new Map(gameMedia.map(m => [m.title.toLowerCase(), m.image])), []);
 
   return (
@@ -421,7 +424,7 @@ const Tournaments = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
-          <button type="button" data-cursor="hover" className="btn-secondary" style={{ padding: '14px 28px' }}>
+          <button type="button" onClick={() => navigate('/tournaments')} data-cursor="hover" className="btn-secondary" style={{ padding: '14px 28px' }}>
             Browse all tournaments →
           </button>
         </div>
