@@ -176,7 +176,7 @@ const Signin = ({ isOpen, onClose, onSwitchToSignup }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/login', {
+      const res = await fetch('https://apexnovaa.me/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password }),
@@ -201,7 +201,7 @@ const Signin = ({ isOpen, onClose, onSwitchToSignup }) => {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      const res = await fetch('http://127.0.0.1:8000/api/auth/google', {
+      const res = await fetch('https://apexnovaa.me/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ idToken }),

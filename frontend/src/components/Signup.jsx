@@ -417,7 +417,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/send-otp', {
+      const res = await fetch('https://apexnovaa.me/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: form.email }),
@@ -439,7 +439,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/verify-otp', {
+      const res = await fetch('https://apexnovaa.me/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: form.email, otp: form.otp }),
@@ -459,7 +459,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/auth/register', {
+      const res = await fetch('https://apexnovaa.me/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ 
@@ -489,7 +489,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      const res = await fetch('http://127.0.0.1:8000/api/auth/google', {
+      const res = await fetch('https://apexnovaa.me/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ idToken }),
