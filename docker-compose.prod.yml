@@ -1,0 +1,99 @@
+services:
+
+  # ── MySQL Database ─────────────────────────────────────────────
+  db:
+    image: mysql:8
+    container_name: mysql_db_prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-apexnova}
+      MYSQL_USER: ${DB_USERNAME:-user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "127.0.0.1:3307:3306" # Only expose to localhost for security
+    volumes:
+      - db_data_prod:/var/lib/mysql
+
+  # ── Redis (Optional but recommended for queues/cache) ──────────
+  redis:
+    image: redis:7-alpine
+    container_name: redis_prod
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data_prod:/data
+
+  # ── Laravel Backend (Web Server) ───────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: laravel_app_prod
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+
+  # ── Laravel Queue Worker ───────────────────────────────────────
+  queue-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: laravel_queue_prod
+    restart: always
+    command: php artisan queue:work --sleep=3 --tries=3
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+      - backend
+
+  # ── Laravel Reverb WebSocket Server ───────────────────────────
+  reverb:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: reverb_socket_prod
+    restart: always
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+      - backend
+
+  # ── React Frontend (Nginx Server) ──────────────────────────────
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: react_app_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443" # For SSL if you add it later
+    depends_on:
+      - backend
+
+volumes:
+  db_data_prod:
+  redis_data_prod:
