@@ -30,7 +30,7 @@ const GAMES = [
 ];
 const TIMES = ['Today', 'Weekly', 'All-time'];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://apexnovaa.me/api';
 
 /* Build a cheap deterministic sparkline from the user id + score
    so it's stable across refreshes and doesn't reset every poll. */
