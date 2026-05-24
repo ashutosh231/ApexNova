@@ -6,6 +6,7 @@ import { API_BASE_URL, authHeaders } from '../lib/api';
 import { useRoomChannel } from '../hooks/useRoomChannel';
 import PixelMemoryGame from '../components/PixelMemoryGame';
 import RoomInvitePanel from '../components/RoomInvitePanel';
+import VoiceChatPanel from '../components/VoiceChatPanel';
 import { getTournamentConfig, syncSessionFromTournament } from '../data/tournamentConfig.js';
 
 const CYAN = '#00ffff';
@@ -563,6 +564,15 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, lobbyT
         </div>
       )}
 
+      <VoiceChatPanel
+        roomCode={roomCode}
+        userId={user?.id}
+        players={room?.players}
+        token={token}
+        accent={CYAN}
+        secondary={PINK}
+      />
+
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(280px, 1fr) minmax(280px, 1fr)', gap: 16 }}>
         {/* Players */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -1101,14 +1111,16 @@ const MemoryMatchRoomPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <div style={{
-              width: 38, height: 38, borderRadius: 10,
-              background: `linear-gradient(135deg, ${CYAN}, ${PINK})`,
+              width: 38, height: 38, borderRadius: 10, overflow: 'hidden',
               display: 'grid', placeItems: 'center',
+              background: '#0a0a0c',
               boxShadow: `0 6px 22px -8px ${CYAN}`,
             }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0c' }}>
-                <iconify-icon icon={tournament.icon || 'tabler:device-gamepad-2'} width="22" />
-              </span>
+              <img
+                src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+                alt="ApexNova"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             </div>
             <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.04em', color: '#fff' }}>
               Apex<span style={{ color: CYAN }}>Nova</span>

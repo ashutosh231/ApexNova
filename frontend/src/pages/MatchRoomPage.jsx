@@ -6,6 +6,7 @@ import { API_BASE_URL, authHeaders } from '../lib/api';
 import { useRoomChannel } from '../hooks/useRoomChannel';
 import RoomInvitePanel from '../components/RoomInvitePanel';
 import TournamentGameRouter from '../components/games/TournamentGameRouter';
+import VoiceChatPanel from '../components/VoiceChatPanel';
 import {
   BACKEND_GAME_DEFAULT_TOURNAMENT,
   DEFAULT_TOURNAMENT_ID,
@@ -48,14 +49,16 @@ const ArenaHeader = ({ theme, onBack, phaseLabel }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
         <div style={{
-          width: 38, height: 38, borderRadius: 12,
-          background: `linear-gradient(135deg, ${theme.accent}, ${theme.secondary})`,
+          width: 38, height: 38, borderRadius: 12, overflow: 'hidden',
           display: 'grid', placeItems: 'center',
+          background: '#0a0a0c',
           boxShadow: `0 6px 22px -8px ${theme.accent}`,
         }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.3))', color: '#0a0a0c' }}>
-            <iconify-icon icon={theme.icon || 'tabler:device-gamepad-2'} width="22" />
-          </span>
+          <img
+            src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+            alt="ApexNova"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </div>
         <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.04em', color: '#fff' }}>
           Apex<span style={{ color: theme.accent }}>Nova</span>
@@ -594,6 +597,16 @@ const MatchLobby = ({ token, user, initialRoomCode, onMatchStart, onBack, theme 
           <span style={{ fontSize: 13 }}>{error}</span>
         </div>
       )}
+
+      {/* Voice chat strip */}
+      <VoiceChatPanel
+        roomCode={roomCode}
+        userId={user?.id}
+        players={room?.players}
+        token={token}
+        accent={accent}
+        secondary={sec}
+      />
 
       {/* Layout */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(280px, 1fr) minmax(280px, 1fr)', gap: 16 }}>

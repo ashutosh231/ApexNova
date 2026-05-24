@@ -17,17 +17,17 @@ import { useAuth } from '../context/AuthContext';
 // isRoute:     use React Router Link to go to href
 const navLinks = [
   { label: 'Tournaments', href: '/tournaments', isRoute: true },
-  { label: 'About Us',    href: '/about',       isRoute: true },
+  { label: 'About Us', href: '/about', isRoute: true },
   { label: 'Leaderboard', href: '/leaderboard', isRoute: true },
-  { label: 'Contact',     scrollTarget: 'contact' },
+  { label: 'Contact', scrollTarget: 'contact' },
 ];
 
 /* ─── Constants ─────────────────────────────────────────────── */
-const LIME      = '#ccff00';
-const PILL_BG   = 'rgba(255,255,255,0.07)';
+const LIME = '#ccff00';
+const PILL_BG = 'rgba(255,255,255,0.07)';
 const GSAP_EASE = 'power3.out';
-const EASE_CSS  = 'cubic-bezier(0.4,0,0.2,1)';
-const TR        = `0.35s ${EASE_CSS}`;
+const EASE_CSS = 'cubic-bezier(0.4,0,0.2,1)';
+const TR = `0.35s ${EASE_CSS}`;
 
 /* ─── Scroll helper ──────────────────────────────────────────── */
 // Scrolls to a section by id without ever touching the URL.
@@ -49,13 +49,13 @@ function scrollToSection(id, navigate, pathname) {
 
 /* ─── NavPill — one pill item with rising-circle GSAP hover ──── */
 function NavPill({ link, index, pillH, onScrollClick }) {
-  const pillRef   = useRef(null);
+  const pillRef = useRef(null);
   const circleRef = useRef(null);
-  const tlRef     = useRef(null);
-  const tweenRef  = useRef(null);
+  const tlRef = useRef(null);
+  const tweenRef = useRef(null);
 
   useEffect(() => {
-    const pill   = pillRef.current;
+    const pill = pillRef.current;
     const circle = circleRef.current;
     if (!pill || !circle) return;
 
@@ -63,12 +63,12 @@ function NavPill({ link, index, pillH, onScrollClick }) {
       const { width: w, height: h } = pill.getBoundingClientRect();
       if (!w) return;
 
-      const R       = ((w * w) / 4 + h * h) / (2 * h);
-      const D       = Math.ceil(2 * R) + 2;
-      const delta   = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
+      const R = ((w * w) / 4 + h * h) / (2 * h);
+      const D = Math.ceil(2 * R) + 2;
+      const delta = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
       const originY = D - delta;
 
-      circle.style.width  = `${D}px`;
+      circle.style.width = `${D}px`;
       circle.style.height = `${D}px`;
       circle.style.bottom = `-${delta}px`;
 
@@ -84,13 +84,13 @@ function NavPill({ link, index, pillH, onScrollClick }) {
       const tl = gsap.timeline({ paused: true });
       tl.to(circle, { scale: 1.25, xPercent: -50, duration: 0.7, ease: GSAP_EASE }, 0);
       if (label) tl.to(label, { y: -(h + 8), opacity: 0, duration: 0.5, ease: GSAP_EASE }, 0);
-      if (hover) tl.to(hover, { y: 0, opacity: 1,       duration: 0.5, ease: GSAP_EASE }, 0);
+      if (hover) tl.to(hover, { y: 0, opacity: 1, duration: 0.5, ease: GSAP_EASE }, 0);
       tlRef.current = tl;
     };
 
     setup();
     window.addEventListener('resize', setup, { passive: true });
-    if (document.fonts) document.fonts.ready.then(setup).catch(() => {});
+    if (document.fonts) document.fonts.ready.then(setup).catch(() => { });
     return () => window.removeEventListener('resize', setup);
   }, []);
 
@@ -187,11 +187,11 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [scrolled,   setScrolled]   = useState(false);
-  const reduced   = useReducedMotion();
+  const [scrolled, setScrolled] = useState(false);
+  const reduced = useReducedMotion();
   const MotionDiv = useMemo(() => motion.div, []);
-  const MotionA   = useMemo(() => motion.a, []);
-  const navigate  = useNavigate();
+  const MotionA = useMemo(() => motion.a, []);
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const dropdownRef = useRef(null);
 
@@ -207,7 +207,7 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
   }, [profileOpen]);
 
   const logoIconRef = useRef(null);
-  const logoTween   = useRef(null);
+  const logoTween = useRef(null);
   const pillsWrapRef = useRef(null);
 
   /* ── Scroll shrink at 100px ── */
@@ -256,11 +256,11 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       padding: scrolled ? '10px 24px' : '20px 24px 0',
-      background:           scrolled ? 'rgba(10,10,10,0.82)' : 'transparent',
-      backdropFilter:       scrolled ? 'blur(22px) saturate(1.4)' : 'none',
+      background: scrolled ? 'rgba(10,10,10,0.82)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(22px) saturate(1.4)' : 'none',
       WebkitBackdropFilter: scrolled ? 'blur(22px) saturate(1.4)' : 'none',
-      borderBottom:  scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
-      boxShadow:     scrolled ? '0 4px 28px rgba(0,0,0,0.55)' : 'none',
+      borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+      boxShadow: scrolled ? '0 4px 28px rgba(0,0,0,0.55)' : 'none',
       transition: t === 'none' ? 'none'
         : `padding ${TR}, background ${TR}, backdrop-filter ${TR}, -webkit-backdrop-filter ${TR}, border-color ${TR}, box-shadow ${TR}`,
     }}>
@@ -283,14 +283,17 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
         >
           <div ref={logoIconRef} style={{
             width: scrolled ? 36 : 44, height: scrolled ? 36 : 44,
-            background: LIME, borderRadius: 14,
+            borderRadius: 14, overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: scrolled ? 15 : 18, fontWeight: 800, color: '#000',
-            fontFamily: "'Space Grotesk', sans-serif",
+            background: '#0a0a0c',
             boxShadow: '0 0 28px rgba(204,255,0,0.28)',
             transition: `${t}, font-size ${t}`, willChange: 'transform',
           }}>
-            A
+            <img
+              src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+              alt="ApexNova"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           </div>
           <span style={{
             fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700,
@@ -337,7 +340,7 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
             }} />
             SYS · OK
           </div>
-          
+
           {user ? (
             <div style={{ position: 'relative' }} ref={dropdownRef}>
               <button
@@ -368,7 +371,7 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
                 <span style={{ color: '#ebebeb', fontSize: 13, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>
                   {user.name}
                 </span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#ebebeb', transition: 'transform 0.2s', transform: profileOpen ? 'rotate(180deg)' : 'none' }}><path d="M6 9l6 6 6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#ebebeb', transition: 'transform 0.2s', transform: profileOpen ? 'rotate(180deg)' : 'none' }}><path d="M6 9l6 6 6-6" /></svg>
               </button>
 
               <AnimatePresence>
@@ -400,7 +403,7 @@ const Navbar = ({ onGetStarted, onSignIn }) => {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                       User Profile
                     </button>
-                    
+
                     <button type="button" onClick={() => { setProfileOpen(false); navigate('/profile?tab=settings'); }} style={{ width: '100%', padding: '12px 14px', background: 'transparent', border: 'none', color: '#ebebeb', textAlign: 'left', fontSize: 14, fontFamily: "'Space Grotesk', sans-serif", cursor: 'pointer', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.2s ease' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#ccff00'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ebebeb'; }}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                       Account Settings

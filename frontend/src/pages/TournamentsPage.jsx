@@ -276,11 +276,15 @@ const TournamentsPage = () => {
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: `linear-gradient(135deg, ${LIME}, #10b981)`,
+              width: 32, height: 32, borderRadius: 10, overflow: 'hidden',
               display: 'grid', placeItems: 'center',
+              background: '#0a0a0c',
             }}>
-              <iconify-icon icon="lucide:trophy" width="17" style={{ color: '#000' }} />
+              <img
+                src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+                alt="ApexNova"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             </div>
             <div style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.04em', color: '#fff' }}>
               Tournaments

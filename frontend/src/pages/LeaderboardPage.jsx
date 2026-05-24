@@ -385,8 +385,21 @@ const LeaderboardPage = () => {
             <iconify-icon icon="tabler:arrow-left" width="14" />
             Home
           </Link>
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18, color: '#ebebeb', letterSpacing: '-0.05em' }}>
-            Apex<span style={{ color: LIME }}>Nova</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10, overflow: 'hidden',
+              background: '#0a0a0c',
+              boxShadow: `0 0 18px -6px ${LIME}`,
+            }}>
+              <img
+                src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+                alt="ApexNova"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18, color: '#ebebeb', letterSpacing: '-0.05em' }}>
+              Apex<span style={{ color: LIME }}>Nova</span>
+            </div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
             <button

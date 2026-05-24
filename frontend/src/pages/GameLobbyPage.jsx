@@ -272,12 +272,16 @@ const GameLobbyPage = () => {
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
-                width: 38, height: 38, borderRadius: 12,
-                background: `linear-gradient(135deg, ${accent}, ${sec})`,
+                width: 38, height: 38, borderRadius: 12, overflow: 'hidden',
                 display: 'grid', placeItems: 'center',
+                background: '#0a0a0c',
                 boxShadow: `0 6px 20px -8px ${accent}`,
               }}>
-                <iconify-icon icon={tournament.icon} width="22" style={{ color: '#0a0a0c' }} />
+                <img
+                  src="https://img.magnific.com/premium-vector/gamer-logo-design-gaming-logo_327429-18.jpg"
+                  alt="ApexNova"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
               <div>
                 <div style={{ fontWeight: 800, fontSize: 17, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>

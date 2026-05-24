@@ -8,6 +8,7 @@ use App\Http\Controllers\LobbyController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\GameRoomController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\LiveKitController;
 
 Route::get('/tournaments', [TournamentController::class, 'index']);
 
@@ -48,6 +49,9 @@ Route::middleware('auth:api')->group(function () {
 
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index']);
+
+    // LiveKit — voice/video token (mints short-lived JWT for the Web SDK)
+    Route::get('/livekit/token', [LiveKitController::class, 'token']);
 
     // Game Rooms
     Route::prefix('rooms')->group(function () {
