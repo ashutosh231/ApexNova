@@ -9,6 +9,7 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\GameRoomController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\LiveKitController;
+use App\Http\Controllers\SubscriptionController;
 
 Route::get('/tournaments', [TournamentController::class, 'index']);
 
@@ -54,18 +55,26 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/livekit/token', [LiveKitController::class, 'token']);
 
     // Game Rooms
-    Route::prefix('rooms')->group(function () {
-        Route::post('/invite',                [GameRoomController::class, 'invite']);
-        Route::post('/',                      [GameRoomController::class, 'create']);
-        Route::get('/{code}',                 [GameRoomController::class, 'show']);
-        Route::post('/{code}/join',           [GameRoomController::class, 'join']);
-        Route::post('/{code}/leave',          [GameRoomController::class, 'leave']);
-        Route::post('/{code}/ready',          [GameRoomController::class, 'ready']);
-        Route::post('/{code}/start',          [GameRoomController::class, 'start']);
-        Route::post('/{code}/play-again',     [GameRoomController::class, 'playAgain']);
-        Route::post('/{code}/chat',           [GameRoomController::class, 'chat']);
-        Route::post('/{code}/score',          [GameRoomController::class, 'submitScore']);
-        Route::post('/{code}/move',           [GameRoomController::class, 'relayMove']);
-        Route::get('/{code}/messages',        [GameRoomController::class, 'messages']);
+        Route::prefix('rooms')->group(function () {
+            Route::post('/invite',                [GameRoomController::class, 'invite']);
+            Route::post('/',                      [GameRoomController::class, 'create']);
+            Route::get('/{code}',                 [GameRoomController::class, 'show']);
+            Route::post('/{code}/join',           [GameRoomController::class, 'join']);
+            Route::post('/{code}/leave',          [GameRoomController::class, 'leave']);
+            Route::post('/{code}/ready',          [GameRoomController::class, 'ready']);
+            Route::post('/{code}/start',          [GameRoomController::class, 'start']);
+            Route::post('/{code}/play-again',     [GameRoomController::class, 'playAgain']);
+            Route::post('/{code}/chat',           [GameRoomController::class, 'chat']);
+            Route::post('/{code}/score',          [GameRoomController::class, 'submitScore']);
+            Route::post('/{code}/move',           [GameRoomController::class, 'relayMove']);
+            Route::get('/{code}/messages',        [GameRoomController::class, 'messages']);
+        });
+
+        // Subscription / Play Pass
+        Route::prefix('subscription')->group(function () {
+            Route::get('/entitlements', [SubscriptionController::class, 'entitlements']);
+            Route::post('/check',       [SubscriptionController::class, 'checkAccess']);
+            Route::post('/activate',    [SubscriptionController::class, 'activatePass']);
+        });
     });
-});
+

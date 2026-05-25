@@ -9,6 +9,8 @@ import {
   ALL_TOURNAMENT_CONFIGS,
 } from '../data/tournamentConfig.js';
 import GamePattern from '../components/GamePattern.jsx';
+import { useSubscription } from '../hooks/useSubscription.js';
+import PlayPassModal from '../components/PlayPassModal.jsx';
 
 const MONO = "'JetBrains Mono', monospace";
 const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
@@ -91,6 +93,11 @@ const GameLobbyPage = () => {
     syncSessionFromTournament(tournament.id);
   }, [tournament.id]);
 
+  const { checkAndGate, activatePlayPass, entitlements } = useSubscription();
+
+  // ── Play Pass gate state ───────────────────────────────────────────
+  const [passModal, setPassModal] = useState({ open: false, reason: null, message: null });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [overview, setOverview] = useState({ user: null, leaderboard: [], friends: [], game: null });
@@ -141,7 +148,12 @@ const GameLobbyPage = () => {
     return () => clearTimeout(delay);
   }, [addTag, token]);
 
-  const handlePlayNow = () => {
+  const handlePlayNow = async () => {
+    const result = await checkAndGate(tournament.backendGame, 'solo');
+    if (!result.allowed) {
+      setPassModal({ open: true, reason: result.reason, message: result.message });
+      return;
+    }
     const route = tournament.usesMemoryShell
       ? `/memory-match-room?mode=solo&tournament=${tournament.id}`
       : `/match-room?mode=solo&tournament=${tournament.id}`;
@@ -149,6 +161,11 @@ const GameLobbyPage = () => {
   };
 
   const handlePlayFriend = async () => {
+    const result = await checkAndGate(tournament.backendGame, 'friend');
+    if (!result.allowed) {
+      setPassModal({ open: true, reason: result.reason, message: result.message });
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE_URL}/rooms`, {
         method: 'POST',
@@ -807,6 +824,16 @@ const GameLobbyPage = () => {
           }
         }
       `}</style>
+
+      {/* ── Play Pass Gate Modal ──────────────────────────────────────── */}
+      <PlayPassModal
+        isOpen={passModal.open}
+        onClose={() => setPassModal({ open: false, reason: null, message: null })}
+        reason={passModal.reason}
+        message={passModal.message}
+        onActivate={activatePlayPass}
+        accent={accent}
+      />
     </div>
   );
 };

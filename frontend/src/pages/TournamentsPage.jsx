@@ -4,6 +4,8 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { buildFilters } from '../data/allTournaments.js';
 import { getTournamentConfig, syncSessionFromTournament } from '../data/tournamentConfig.js';
 import { useTournaments } from '../hooks/useTournaments.js';
+import { useSubscription } from '../hooks/useSubscription.js';
+import PremiumLockModal from '../components/PremiumLockModal.jsx';
 
 const LIME = '#ccff00';
 const PURPLE = '#bd00ff';
@@ -40,7 +42,7 @@ function cardTheme(t) {
   return GAME_THEME[t.id] || { c1: LIME, c2: '#10b981' };
 }
 
-function TournamentCard({ t, index }) {
+function TournamentCard({ t, index, isLocked, isLimitHit, onLockClick }) {
   const navigate = useNavigate();
   const reduced = useReducedMotion();
   const pct = t.fill_percent ?? 0;
@@ -51,8 +53,31 @@ function TournamentCard({ t, index }) {
   const cfg = getTournamentConfig(t.id);
   const gameIcon = cfg.icon || 'tabler:device-gamepad-2';
 
+  const [timeLeftToMidnight, setTimeLeftToMidnight] = useState('');
+
+  useEffect(() => {
+    if (!isLimitHit) return;
+
+    const calcTime = () => {
+      const now = new Date();
+      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      const diffMs = midnight - now;
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeftToMidnight(`${hours}h ${minutes}m`);
+    };
+
+    calcTime();
+    const interval = setInterval(calcTime, 30000); // update every 30s
+    return () => clearInterval(interval);
+  }, [isLimitHit]);
+
   const handleJoin = (e) => {
     e?.stopPropagation();
+    if (isLocked || isLimitHit) {
+      onLockClick();
+      return;
+    }
     syncSessionFromTournament(t.id);
     navigate(`/lobby/${cfg.slug}`);
   };
@@ -60,15 +85,30 @@ function TournamentCard({ t, index }) {
   return (
     <motion.article
       className="tournament-card"
-      style={{ '--tc-accent': c1, '--tc-secondary': c2 }}
+      style={{
+        '--tc-accent': isLimitHit ? '#f97316' : (isLocked ? LIME : c1),
+        '--tc-secondary': isLimitHit ? '#ef4444' : (isLocked ? '#10b981' : c2),
+        cursor: 'pointer',
+        borderColor: isLimitHit ? 'rgba(249, 115, 22, 0.25)' : (isLocked ? 'rgba(204, 255, 0, 0.15)' : 'rgba(255, 255, 255, 0.06)'),
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
       initial={reduced ? false : { opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: index * 0.05 }}
       onClick={handleJoin}
       layout
     >
-      <motion.div className="tournament-card-media" layout="position">
-        <img src={t.coverImage ?? t.cover_image} alt={t.name} loading="lazy" />
+      <motion.div className="tournament-card-media" layout="position" style={{ overflow: 'hidden' }}>
+        <img
+          src={t.coverImage ?? t.cover_image}
+          alt={t.name}
+          loading="lazy"
+          style={{
+            filter: isLimitHit ? 'blur(4px) grayscale(0.7) brightness(0.28)' : (isLocked ? 'blur(5px) grayscale(0.9) brightness(0.25)' : 'none'),
+            transform: (isLocked || isLimitHit) ? 'scale(1.05)' : 'scale(1)',
+            transition: 'all 0.45s ease',
+          }}
+        />
         <motion.div
           aria-hidden
           style={{
@@ -80,25 +120,89 @@ function TournamentCard({ t, index }) {
             `,
           }}
         />
+        {isLocked && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'grid', placeItems: 'center',
+            zIndex: 10,
+            background: 'rgba(6, 6, 8, 0.55)',
+          }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: '50%',
+              background: 'rgba(10,10,14,0.92)',
+              border: `1.5px solid ${LIME}`,
+              display: 'grid', placeItems: 'center',
+              color: LIME,
+              boxShadow: `0 0 24px ${LIME}55, inset 0 0 10px ${LIME}33`,
+              position: 'relative',
+            }}>
+              <iconify-icon icon="lucide:lock" width="20" style={{ filter: `drop-shadow(0 0 4px ${LIME})` }} />
+              <div style={{
+                position: 'absolute', inset: -6, borderRadius: '50%',
+                border: `1px solid ${LIME}44`,
+                animation: 'lockRingPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+              }} />
+            </div>
+          </div>
+        )}
+        {isLimitHit && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'grid', placeItems: 'center',
+            zIndex: 10,
+            background: 'rgba(6, 6, 8, 0.55)',
+          }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: '50%',
+              background: 'rgba(10,10,14,0.92)',
+              border: '1px solid #f97316',
+              display: 'grid', placeItems: 'center',
+              color: '#f97316',
+              boxShadow: `0 0 24px rgba(249, 115, 22, 0.55), inset 0 0 10px rgba(249, 115, 22, 0.33)`,
+              position: 'relative',
+            }}>
+              <iconify-icon icon="lucide:clock" width="20" style={{ filter: `drop-shadow(0 0 4px #f97316)` }} />
+              <div style={{
+                position: 'absolute', inset: -6, borderRadius: '50%',
+                border: '1px solid rgba(249, 115, 22, 0.44)',
+                animation: 'lockRingPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+              }} />
+            </div>
+          </div>
+        )}
         <div style={{
           position: 'absolute', top: 12, left: 12,
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '5px 11px', borderRadius: 999,
-          background: tc.bg, border: `1px solid ${tc.border}`,
-          backdropFilter: 'blur(10px)',
+          padding: '6px 12px', borderRadius: 999,
+          background: isLimitHit ? 'rgba(249, 115, 22, 0.15)' : (isLocked ? 'rgba(204, 255, 0, 0.15)' : tc.bg),
+          border: `1px solid ${isLimitHit ? 'rgba(249, 115, 22, 0.4)' : (isLocked ? 'rgba(204, 255, 0, 0.38)' : tc.border)}`,
+          backdropFilter: 'blur(12px)',
           fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
-          color: tc.text, textTransform: 'uppercase',
+          color: isLimitHit ? '#f97316' : (isLocked ? LIME : tc.text), textTransform: 'uppercase',
+          zIndex: 11,
         }}>
-          {isLive && <span className="arena-dot" style={{ width: 5, height: 5 }} />}
-          {tag}
+          {isLive && !isLocked && !isLimitHit && <span className="arena-dot" style={{ width: 5, height: 5 }} />}
+          {isLimitHit ? (
+            <>
+              <iconify-icon icon="lucide:clock" width="10" />
+              DAILY LIMIT HIT
+            </>
+          ) : (isLocked ? (
+            <>
+              <iconify-icon icon="lucide:lock" width="10" />
+              PLAY PASS ONLY
+            </>
+          ) : tag)}
         </div>
         <motion.div style={{
           position: 'absolute', top: 12, right: 12,
           padding: '5px 10px', borderRadius: 999,
-          background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.1)',
           fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: '0.08em',
           color: 'rgba(235,235,235,0.85)',
           display: 'inline-flex', alignItems: 'center', gap: 4,
+          zIndex: 11,
+          opacity: (isLocked || isLimitHit) ? 0.6 : 1,
         }}>
           <iconify-icon icon="lucide:clock" width="10" />
           {t.timeLeft ?? t.time_left}
@@ -114,7 +218,7 @@ function TournamentCard({ t, index }) {
         </motion.span>
       </motion.div>
 
-      <div className="tournament-card-body">
+      <div className="tournament-card-body" style={{ opacity: (isLocked || isLimitHit) ? 0.7 : 1, transition: 'opacity 0.3s ease' }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <span style={{
             fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
@@ -176,19 +280,69 @@ function TournamentCard({ t, index }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleJoin}
-          className="arena-btn"
-          style={{
-            marginTop: 'auto', width: '100%', padding: '12px 0',
-            '--btn-color': c1, '--btn-color-2': c2,
-            fontSize: 12,
-          }}
-        >
-          <iconify-icon icon="lucide:swords" width="15" />
-          Join Tournament
-        </button>
+        {isLimitHit ? (
+          <motion.button
+            type="button"
+            onClick={handleJoin}
+            whileHover={{ scale: 1.02, background: '#f97316', color: '#000', boxShadow: `0 8px 24px rgba(249, 115, 22, 0.66)` }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              marginTop: 'auto', width: '100%', padding: '12px 0',
+              fontSize: 12,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 900,
+              cursor: 'pointer',
+              background: 'rgba(249, 115, 22, 0.05)',
+              border: `1.5px solid #f97316`,
+              borderRadius: 14,
+              color: '#f97316',
+              boxShadow: `0 0 16px rgba(249, 115, 22, 0.22)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              transition: 'color 0.25s, background 0.25s, box-shadow 0.25s',
+            }}
+          >
+            <iconify-icon icon="lucide:clock" width="14" />
+            Limit Hit (Resets: {timeLeftToMidnight})
+          </motion.button>
+        ) : isLocked ? (
+          <motion.button
+            type="button"
+            onClick={handleJoin}
+            whileHover={{ scale: 1.02, background: LIME, color: '#000', boxShadow: `0 8px 24px ${LIME}66` }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              marginTop: 'auto', width: '100%', padding: '12px 0',
+              fontSize: 12,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 900,
+              cursor: 'pointer',
+              background: 'rgba(204, 255, 0, 0.05)',
+              border: `1.5px solid ${LIME}`,
+              borderRadius: 14,
+              color: LIME,
+              boxShadow: `0 0 16px ${LIME}22`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              transition: 'color 0.25s, background 0.25s, box-shadow 0.25s',
+            }}
+          >
+            <iconify-icon icon="lucide:lock" width="14" />
+            Unlock with Play Pass
+          </motion.button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleJoin}
+            className="arena-btn"
+            style={{
+              marginTop: 'auto', width: '100%', padding: '12px 0',
+              '--btn-color': c1, '--btn-color-2': c2,
+              fontSize: 12,
+            }}
+          >
+            <iconify-icon icon="lucide:swords" width="15" />
+            Join Tournament
+          </button>
+        )}
       </div>
     </motion.article>
   );
@@ -200,6 +354,23 @@ const TournamentsPage = () => {
   const searchRef = useRef(null);
   const reduced = useReducedMotion();
   const { tournaments, meta, loading } = useTournaments();
+
+  const { entitlements, refreshEntitlements } = useSubscription();
+  const isPremium = entitlements?.tier === 'premium';
+
+  const [lockModal, setLockModal] = useState({ open: false, gameName: '', accent: LIME });
+
+  const unlockedGameId = useMemo(() => {
+    if (!tournaments || tournaments.length === 0) return null;
+    const day = new Date().getDate();
+    const index = day % tournaments.length;
+    return tournaments[index]?.id || tournaments[0]?.id;
+  }, [tournaments]);
+
+  const unlockedGameName = useMemo(() => {
+    const active = tournaments.find(t => t.id === unlockedGameId);
+    return active ? active.name : '';
+  }, [tournaments, unlockedGameId]);
 
   const bloomFilters = useMemo(() => buildFilters(
     tournaments.map((t) => ({
@@ -395,6 +566,86 @@ const TournamentsPage = () => {
           </div>
         </motion.div>
 
+        {/* Subscription Tier Notice Banner */}
+        {!loading && (
+          isPremium ? (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(204,255,0,0.08), rgba(189,0,255,0.06))',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${LIME}33`,
+              borderRadius: 20,
+              padding: '20px 24px',
+              marginBottom: 24,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              boxShadow: `0 8px 32px 0 ${LIME}11`,
+            }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 14,
+                background: `${LIME}18`, border: `1px solid ${LIME}45`,
+                display: 'grid', placeItems: 'center', fontSize: 24,
+                color: LIME, filter: `drop-shadow(0 0 10px ${LIME}55)`,
+              }}>
+                🏆
+              </div>
+              <div>
+                <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: LIME, textTransform: 'uppercase', marginBottom: 2 }}>
+                  Play Pass Active
+                </div>
+                <div style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>
+                  Welcome back! You have <span style={{ color: LIME, fontWeight: 800 }}>unlimited plays</span> across all 6 games and full access to all tournaments.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: 20,
+              padding: '20px 24px',
+              marginBottom: 24,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              flexWrap: 'wrap',
+              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: 'rgba(204,255,0,0.1)', border: '1px solid rgba(204,255,0,0.3)',
+                  display: 'grid', placeItems: 'center', fontSize: 24,
+                }}>
+                  ⚡
+                </div>
+                <div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: LIME, textTransform: 'uppercase', marginBottom: 2 }}>
+                    Free Tier Active
+                  </div>
+                  <div style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>
+                    Only <span style={{ color: LIME, fontWeight: 800 }}>{unlockedGameName}</span> is unlocked today! Daily plays remaining: <span style={{ color: LIME, fontWeight: 800 }}>{Math.max(0, 3 - (entitlements?.daily_play_count || 0))}/3</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setLockModal({ open: true, gameName: 'All Games', accent: LIME })}
+                className="arena-btn"
+                style={{
+                  padding: '10px 20px', fontSize: 12,
+                  '--btn-color': LIME, '--btn-color-2': PURPLE,
+                }}
+              >
+                🏆 Get Play Pass
+              </button>
+            </div>
+          )
+        )}
+
         <div className="tournaments-filters">
           {CATEGORIES.map((cat) => (
             <button
@@ -424,12 +675,34 @@ const TournamentsPage = () => {
           <AnimatePresence mode="popLayout">
             <motion.div className="tournaments-grid" layout>
               {filtered.map((t, i) => (
-                <TournamentCard key={t.id} t={t} index={i} />
+                <TournamentCard
+                  key={t.id}
+                  t={t}
+                  index={i}
+                  isLocked={!isPremium && t.id !== unlockedGameId}
+                  isLimitHit={!isPremium && t.id === unlockedGameId && (entitlements?.daily_play_count >= 3)}
+                  onLockClick={() => setLockModal({ open: true, gameName: t.name, accent: cardTheme(t).c1 })}
+                />
               ))}
             </motion.div>
           </AnimatePresence>
         )}
       </div>
+
+      <PremiumLockModal
+        isOpen={lockModal.open}
+        onClose={() => setLockModal(prev => ({ ...prev, open: false }))}
+        gameName={lockModal.gameName}
+        onSuccess={refreshEntitlements}
+        accent={lockModal.accent}
+      />
+      <style>{`
+        @keyframes lockRingPulse {
+          0% { transform: scale(0.92); opacity: 0.95; }
+          50% { transform: scale(1.26); opacity: 0.05; }
+          100% { transform: scale(0.92); opacity: 0.95; }
+        }
+      `}</style>
     </motion.div>
   );
 };

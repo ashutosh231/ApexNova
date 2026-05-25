@@ -34,6 +34,7 @@ import { MatchProvider } from './context/MatchContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { useSearchParams } from 'react-router-dom';
 import GlobalInviteListener from './components/GlobalInviteListener.jsx';
+import PricingSection from './components/PricingSection.jsx';
 
 /* ─── Homepage shell ─────────────────────────────────── */
 const HomePage = ({ onGetStarted, onSignIn }) => {
@@ -69,6 +70,10 @@ const HomePage = ({ onGetStarted, onSignIn }) => {
             <div className="divider" />
 
             <Features />
+
+            <div className="divider" />
+
+            <PricingSection onSignInRequired={onGetStarted} />
 
             <div className="divider" />
 

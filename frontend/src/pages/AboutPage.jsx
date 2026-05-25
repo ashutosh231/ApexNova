@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import PricingSection from '../components/PricingSection.jsx';
 
 /* ─── Constants ───────────────────────────────────────────── */
 const LIME = '#ccff00';
@@ -524,6 +525,11 @@ const AboutPage = () => {
               <TeamCard key={member.name} member={member} index={i} />
             ))}
           </div>
+        </div>
+
+        {/* ═══ Pricing ════════════════════════════════════ */}
+        <div style={{ margin: '0 -28px' }}>
+          <PricingSection />
         </div>
 
         {/* ═══ CTA ════════════════════════════════════════════ */}
