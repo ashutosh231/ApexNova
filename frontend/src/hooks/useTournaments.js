@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ALL_TOURNAMENTS } from '../data/allTournaments.js';
+import { API_BASE_URL } from '../lib/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://apexnovaa.me/api';
 
 function normalizeStatic(t) {
   const [curStr, maxStr] = t.players.split('/');

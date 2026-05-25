@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
+import { API_BASE_URL } from '../lib/api';
 /* ─────────────────────────────────────────────
    Tiny icon helpers
 ───────────────────────────────────────────── */
@@ -417,7 +418,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('https://apexnovaa.me/api/auth/send-otp', {
+      const res = await fetch(`${API_BASE_URL}/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: form.email }),
@@ -439,7 +440,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('https://apexnovaa.me/api/auth/verify-otp', {
+      const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: form.email, otp: form.otp }),
@@ -459,7 +460,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await fetch('https://apexnovaa.me/api/auth/register', {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ 
@@ -489,7 +490,7 @@ const Signup = ({ isOpen, onClose, onSwitchToSignin }) => {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      const res = await fetch('https://apexnovaa.me/api/auth/google', {
+      const res = await fetch(`${API_BASE_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ idToken }),

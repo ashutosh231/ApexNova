@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Squares from '../components/Squares';
 import { useAuth } from '../context/AuthContext';
 import getEcho from '../lib/echo';
+import { API_BASE_URL } from '../lib/api';
 
 /* ─── Constants & Styles ─────────────────────────────────── */
 const LIME = '#ccff00';
@@ -30,7 +31,6 @@ const GAMES = [
 ];
 const TIMES = ['Today', 'Weekly', 'All-time'];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://apexnovaa.me/api';
 
 /* Build a cheap deterministic sparkline from the user id + score
    so it's stable across refreshes and doesn't reset every poll. */
