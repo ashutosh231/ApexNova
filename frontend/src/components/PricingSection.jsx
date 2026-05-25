@@ -118,7 +118,9 @@ const Toast = ({ show, type, message }) => (
 /* PricingSection                                         */
 /* ══════════════════════════════════════════════════════ */
 export default function PricingSection({ onSignInRequired }) {
-  const { token, user } = useAuth();
+  const { token, user, updateUser } = useAuth();
+  
+  const isActivePremium = user?.subscription_tier === 'premium' && user?.pass_expires_at && new Date(user.pass_expires_at) > new Date();
 
   const [buying, setBuying]       = useState(false);
   const [toast, setToast]         = useState({ show: false, type: 'success', message: '' });
@@ -165,6 +167,13 @@ export default function PricingSection({ onSignInRequired }) {
           const result = await activatePass(token);
           if (result.success) {
             showToast('success', '🎉 Play Pass activated! Welcome to unlimited gaming.');
+            // Update user context so UI reflects active pass immediately
+            updateUser({
+              ...user,
+              subscription_tier: 'premium',
+              pass_activated_at: new Date().toISOString(),
+              pass_expires_at: result.expires_at,
+            });
           } else if (result.error === 'Play Pass is already active') {
             showToast('success', 'Your Play Pass is already active!');
           } else {
@@ -185,7 +194,7 @@ export default function PricingSection({ onSignInRequired }) {
     });
     rzp.open();
     setBuying(false); // Reset buying state immediately after opening (modal manages itself)
-  }, [token, user, onSignInRequired, showToast]);
+  }, [token, user, onSignInRequired, showToast, updateUser]);
 
   return (
     <section
@@ -230,6 +239,7 @@ export default function PricingSection({ onSignInRequired }) {
               WebkitBackgroundClip: 'text', backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               fontStyle: 'italic',
+              paddingRight: '0.1em',
             }}>
               level
             </span>
@@ -321,7 +331,7 @@ export default function PricingSection({ onSignInRequired }) {
               fontFamily: SANS, fontSize: 13, fontWeight: 600,
               color: 'rgba(235,235,235,0.40)',
             }}>
-              Current plan — always free
+              {isActivePremium ? 'Available if your pass expires' : 'Current plan — always free'}
             </div>
           </motion.div>
 
@@ -408,24 +418,26 @@ export default function PricingSection({ onSignInRequired }) {
 
             <motion.button
               onClick={handleBuyPass}
-              disabled={buying}
-              whileHover={{ scale: buying ? 1 : 1.02 }}
-              whileTap={{ scale: buying ? 1 : 0.97 }}
+              disabled={buying || isActivePremium}
+              whileHover={{ scale: (buying || isActivePremium) ? 1 : 1.02 }}
+              whileTap={{ scale: (buying || isActivePremium) ? 1 : 0.97 }}
               style={{
                 width: '100%', padding: '16px 20px',
                 borderRadius: 16, border: 'none',
-                background: `linear-gradient(135deg, ${LIME}, ${PURPLE})`,
-                color: '#000', fontWeight: 900,
+                background: isActivePremium ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${LIME}, ${PURPLE})`,
+                color: isActivePremium ? LIME : '#000', fontWeight: 900,
                 fontSize: 15, letterSpacing: '-0.01em',
-                cursor: buying ? 'not-allowed' : 'pointer',
+                cursor: (buying || isActivePremium) ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                boxShadow: `0 8px 32px -8px ${LIME}55`,
+                boxShadow: isActivePremium ? 'none' : `0 8px 32px -8px ${LIME}55`,
                 opacity: buying ? 0.75 : 1,
                 transition: 'opacity 0.2s',
                 fontFamily: SANS,
               }}
             >
-              {buying ? (
+              {isActivePremium ? (
+                <>✨ Play Pass Active</>
+              ) : buying ? (
                 <>
                   <span style={{
                     width: 16, height: 16, borderRadius: '50%',
@@ -442,9 +454,11 @@ export default function PricingSection({ onSignInRequired }) {
             <p style={{
               marginTop: 12, textAlign: 'center',
               fontSize: 11, fontFamily: MONO,
-              color: 'rgba(235,235,235,0.28)',
+              color: isActivePremium ? LIME : 'rgba(235,235,235,0.28)',
             }}>
-              Secured by Razorpay · Cancel anytime
+              {isActivePremium
+                ? `✓ Current plan · Expires ${new Date(user.pass_expires_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
+                : 'Secured by Razorpay · Cancel anytime'}
             </p>
           </motion.div>
         </div>

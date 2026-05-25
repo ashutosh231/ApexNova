@@ -320,6 +320,18 @@ const ProfilePage = () => {
                   <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4, flexWrap:'wrap' }}>
                     <h1 style={{ margin:0, color:'#fff', fontSize:26, fontWeight:800, letterSpacing:'-0.03em' }}>{user.name}</h1>
                     <span style={{ fontSize:11, color: user.presence_status==='online' ? GREEN : 'rgba(255,255,255,0.35)', background: user.presence_status==='online' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', border:`1px solid ${user.presence_status==='online' ? GREEN+'40' : 'rgba(255,255,255,0.1)'}`, borderRadius:100, padding:'2px 10px' }}>● {user.presence_status}</span>
+                    {user.subscription_tier === 'premium' && user.pass_expires_at && new Date(user.pass_expires_at) > new Date() && (
+                      <span style={{ 
+                        fontSize:11, fontWeight:800, color:'#fff', 
+                        background:'linear-gradient(135deg, #f59e0b, #ec4899, #a855f7)', 
+                        padding:'3px 12px', borderRadius:100, 
+                        border:'1px solid rgba(255,255,255,0.3)',
+                        boxShadow:'0 0 15px rgba(236,72,153,0.5)',
+                        animation:'pulseBadge 2s infinite'
+                      }}>
+                        ✨ PLAYPASS ({Math.ceil((new Date(user.pass_expires_at) - new Date()) / (1000 * 60 * 60 * 24))} DAYS)
+                      </span>
+                    )}
                   </div>
                   <div style={{ color:'rgba(255,255,255,0.4)', fontSize:13, marginBottom:14 }}>
                     {user.gamer_tag ? `@${user.gamer_tag} · ` : ''}{user.email}
@@ -351,6 +363,75 @@ const ProfilePage = () => {
                 <Stat label="Total Points" value={(user.points||0).toLocaleString()} sub="Live tracking" accent={PURPLE}/>
               </motion.div>
             )}
+
+            {/* PlayPass Status Card */}
+            <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.12}}
+              style={{
+                ...glass, borderRadius:18, overflow:'hidden', position:'relative',
+              }}>
+              {user.subscription_tier === 'premium' && user.pass_expires_at && new Date(user.pass_expires_at) > new Date() ? (
+                <>
+                  <div style={{ height:3, background:'linear-gradient(90deg, #f59e0b, #ec4899, #a855f7, #f59e0b)', backgroundSize:'200% 100%', animation:'shimmerStripe 3s ease infinite' }}/>
+                  <div style={{ padding:'20px 24px', display:'flex', alignItems:'center', gap:18, flexWrap:'wrap' }}>
+                    <div style={{
+                      width:48, height:48, borderRadius:14, flexShrink:0,
+                      background:'linear-gradient(135deg, #f59e0b, #ec4899, #a855f7)',
+                      display:'grid', placeItems:'center', fontSize:22,
+                      boxShadow:'0 0 20px rgba(236,72,153,0.4)',
+                    }}>✨</div>
+                    <div style={{ flex:1, minWidth:180 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+                        <span style={{ fontSize:16, fontWeight:800, color:'#fff' }}>Play Pass Active</span>
+                        <span style={{
+                          fontSize:10, fontWeight:800, padding:'2px 10px', borderRadius:100,
+                          background:'linear-gradient(135deg, #f59e0b, #ec4899)',
+                          color:'#fff', letterSpacing:'0.08em',
+                        }}>PREMIUM</span>
+                      </div>
+                      <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)' }}>
+                        Activated {user.pass_activated_at ? new Date(user.pass_activated_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}
+                      </div>
+                    </div>
+                    <div style={{ display:'flex', gap:16, alignItems:'center', flexWrap:'wrap' }}>
+                      <div style={{ textAlign:'center' }}>
+                        <div style={{ fontSize:28, fontWeight:900, fontFamily:font.mono, color:LIME, lineHeight:1 }}>
+                          {Math.ceil((new Date(user.pass_expires_at) - new Date()) / (1000*60*60*24))}
+                        </div>
+                        <div style={{ fontSize:10, color:'rgba(255,255,255,0.35)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Days Left</div>
+                      </div>
+                      <div style={{ width:1, height:32, background:'rgba(255,255,255,0.08)' }}/>
+                      <div style={{ textAlign:'center' }}>
+                        <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)' }}>Expires</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.7)' }}>
+                          {new Date(user.pass_expires_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ height:3, background:'rgba(255,255,255,0.06)' }}/>
+                  <div style={{ padding:'20px 24px', display:'flex', alignItems:'center', gap:18, flexWrap:'wrap' }}>
+                    <div style={{
+                      width:48, height:48, borderRadius:14, flexShrink:0,
+                      background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)',
+                      display:'grid', placeItems:'center', fontSize:22, opacity:0.5,
+                    }}>🎮</div>
+                    <div style={{ flex:1, minWidth:180 }}>
+                      <div style={{ fontSize:16, fontWeight:800, color:'rgba(255,255,255,0.5)', marginBottom:4 }}>Free Tier</div>
+                      <div style={{ fontSize:12, color:'rgba(255,255,255,0.3)' }}>3 plays per day · Limited modes</div>
+                    </div>
+                    <a href="/#pricing" style={{
+                      padding:'10px 20px', borderRadius:12, textDecoration:'none',
+                      background:`linear-gradient(135deg, ${LIME}, ${GREEN})`,
+                      color:'#000', fontWeight:800, fontSize:13,
+                      boxShadow:`0 4px 20px ${LIME}33`,
+                    }}>⚡ Upgrade to Play Pass</a>
+                  </div>
+                </>
+              )}
+            </motion.div>
 
             {/* Matches + Friends */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
@@ -518,7 +599,18 @@ const ProfilePage = () => {
         )}
       </AnimatePresence>
 
-      <style>{`@keyframes spin{to{transform:rotate(360deg);}}`}</style>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg);}}
+        @keyframes pulseBadge{
+          0%, 100% { box-shadow: 0 0 15px rgba(236,72,153,0.5); }
+          50% { box-shadow: 0 0 25px rgba(236,72,153,0.8), 0 0 10px rgba(245,158,11,0.6); }
+        }
+        @keyframes shimmerStripe{
+          0% { background-position: 0% 0%; }
+          50% { background-position: 100% 0%; }
+          100% { background-position: 0% 0%; }
+        }
+      `}</style>
     </div>
   );
 };

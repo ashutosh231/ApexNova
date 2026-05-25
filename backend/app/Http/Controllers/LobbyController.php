@@ -274,6 +274,9 @@ class LobbyController extends Controller
                 'points' => (int) $user->points,
                 'rank' => $rank === false ? null : $rank + 1,
                 'presence_status' => $user->presence_status,
+                'subscription_tier' => $user->subscription_tier ?? 'free',
+                'pass_activated_at' => $user->pass_activated_at,
+                'pass_expires_at' => $user->pass_expires_at,
                 'created_at' => $user->created_at,
             ],
             'stats' => [
